@@ -2,14 +2,54 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kart Oyunu</title>
 <style>
-body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#1a1025;color:#fff;font-family:-apple-system,Helvetica,Arial,sans-serif;text-align:center}
-h1{font-size:2rem}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;background:#1a1025;color:#fff;font-family:-apple-system,Helvetica,Arial,sans-serif}
+.ekran{display:none;min-height:100vh;padding:24px;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.ekran.aktif{display:flex}
+h1{font-size:2.2rem;margin:0}
+h2{margin:0 0 8px}
+p{margin:0;opacity:.8}
+button{width:100%;max-width:340px;padding:16px;border:0;border-radius:16px;font-size:1.1rem;font-weight:600;color:#fff;background:#7c3aed}
+button:active{opacity:.7}
+button.ikincil{background:#2d2040}
 </style>
 </head>
 <body>
-<div><h1>💜 Kart Oyunu</h1><p>Test sayfası çalışıyor!</p></div>
+
+<div id="menu" class="ekran aktif">
+  <h1>💜 Kart Oyunu</h1>
+  <p>Kart çek, görevi yap, birlikte eğlen.</p>
+  <button onclick="goster('modlar')">Oyuna Başla</button>
+</div>
+
+<div id="modlar" class="ekran">
+  <h2>Bir mod seç</h2>
+  <button onclick="modSec('Romantik')">💕 Romantik</button>
+  <button onclick="modSec('Eğlenceli')">🎉 Eğlenceli</button>
+  <button onclick="modSec('Komik')">😂 Komik</button>
+  <button onclick="modSec('Samimi')">🫶 Samimi</button>
+  <button class="ikincil" onclick="goster('menu')">← Geri</button>
+</div>
+
+<div id="oyun" class="ekran">
+  <h2>Seçilen mod: <span id="modAdi"></span></h2>
+  <p>Kartlar bir sonraki aşamada eklenecek.</p>
+  <button class="ikincil" onclick="goster('modlar')">← Mod seçimine dön</button>
+  <button class="ikincil" onclick="goster('menu')">Ana menü</button>
+</div>
+
+<script>
+function goster(id){
+  document.querySelectorAll('.ekran').forEach(function(e){e.classList.remove('aktif');});
+  document.getElementById(id).classList.add('aktif');
+}
+function modSec(ad){
+  document.getElementById('modAdi').textContent=ad;
+  goster('oyun');
+}
+</script>
 </body>
 </html>
