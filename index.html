@@ -340,4 +340,246 @@ function oyunculariCiz(){
         if(o.pcins===v){ op.selected=true; }
         pcSec.appendChild(op);
       });
-      pcSec.
+      pcSec.onchange=function(){
+        OYUNCULAR[i].pcins=pcSec.value;
+        partnerleriDuzelt();
+        partnerleriYenile();
+      };
+      kutu.appendChild(pcSec);
+
+      var et2=document.createElement('div');
+      et2.className='etiket';
+      et2.textContent='Partneri';
+      kutu.appendChild(et2);
+      var ps=document.createElement('select');
+      partnerSecenekleriDoldur(ps,i);
+      ps.onchange=function(){
+        OYUNCULAR[i].partner=(ps.value==="rastgele") ? "rastgele" : Number(ps.value);
+      };
+      kutu.appendChild(ps);
+      PARTNER_SECLER[i]=ps;
+    }
+
+    kap.appendChild(kutu);
+  });
+  document.getElementById('ekleBtn').style.display=(OYUNCULAR.length>=MAX_OYUNCU)?'none':'block';
+}
+
+function oyuncuEkle(){
+  if(OYUNCULAR.length>=MAX_OYUNCU){ return; }
+  OYUNCULAR.push(yeniOyuncu());
+  document.getElementById('oyuncuUyari').textContent="";
+  oyunculariCiz();
+}
+
+function oyuncuSil(i){
+  if(OYUNCULAR.length<=2){ return; }
+  OYUNCULAR.splice(i,1);
+  partnerleriDuzelt();
+  document.getElementById('oyuncuUyari').textContent="";
+  oyunculariCiz();
+}
+
+function oyuncularKontrol(){
+  var gorulen={};
+  var n=OYUNCULAR.length;
+  for(var i=0;i<n;i++){
+    var ad=OYUNCULAR[i].ad.trim();
+    if(ad===""){ return (i+1)+". oyuncunun adını yaz."; }
+    if(OYUNCULAR[i].cins===""){ return ad+" için cinsiyet seç."; }
+    var anahtar=ad.toLocaleLowerCase('tr');
+    if(gorulen[anahtar]){ return "Aynı isim iki kez kullanılmış: "+ad+". İsimleri ayırt edilebilir yap."; }
+    gorulen[anahtar]=true;
+  }
+  if(n>2){
+    for(var j=0;j<n;j++){
+      if(adaylar(j).length===0){
+        return OYUNCULAR[j].ad.trim()+" için seçtiğin partner cinsiyetinde ("+PCINS_ETIKET[OYUNCULAR[j].pcins]+") başka oyuncu yok. Partner cinsiyetini değiştir.";
+      }
+    }
+  }
+  return "";
+}
+
+function oyuncularDevam(){
+  var hata=oyuncularKontrol();
+  document.getElementById('oyuncuUyari').textContent=hata;
+  if(hata!==""){ return; }
+  for(var i=0;i<OYUNCULAR.length;i++){ OYUNCULAR[i].ad=OYUNCULAR[i].ad.trim(); }
+  oyunculariKaydet();
+  goster('modlar');
+}
+
+/* ---------- Mod ekranı ---------- */
+function modlariCiz(){
+  var kap=document.getElementById('modListe');
+  kap.innerHTML='';
+  MODLAR.forEach(function(m){
+    if(modGorevleri(m.ad).length===0){ return; }
+    var b=document.createElement('button');
+    b.className='mod';
+    var ik=document.createElement('span');
+    ik.className='mik';
+    ik.textContent=m.ikon;
+    var metin=document.createElement('span');
+    var baslik=document.createElement('span');
+    baslik.textContent=m.ad;
+    var alt=document.createElement('small');
+    alt.textContent=m.aciklama;
+    metin.appendChild(baslik);
+    metin.appendChild(alt);
+    b.appendChild(ik);
+    b.appendChild(metin);
+    b.onclick=function(){ turSayfasiAc(m.ad); };
+    kap.appendChild(b);
+  });
+}
+
+/* ---------- Tür seçim ekranı ---------- */
+function turSayfasiAc(ad){
+  mod=ad;
+  var m=modBul(ad);
+  document.getElementById('turBaslik').textContent=m.ikon+" "+m.ad;
+  document.getElementById('turAciklama').textContent="Bu mod için hangi görev türleri gelsin?";
+  document.getElementById('uyari').textContent="";
+  var kap=document.getElementById('turGrid');
+  kap.innerHTML='';
+  mevcutTurler(ad).forEach(function(t){
+    var b=document.createElement('button');
+    b.id='tur_'+t.k;
+    b.className='tur';
+    var ik=document.createElement('span');
+    ik.className='ik';
+    ik.textContent=t.e;
+    b.appendChild(ik);
+    b.appendChild(document.createTextNode(t.ad));
+    b.onclick=function(){ turDegis(t.k); };
+    kap.appendChild(b);
+  });
+  turGuncelle();
+  goster('turEkran');
+}
+
+function turGuncelle(){
+  var hepsiAcik=true;
+  mevcutTurler(mod).forEach(function(t){
+    var acik=MOD_TURLER[mod][t.k];
+    document.getElementById('tur_'+t.k).classList.toggle('acik',acik);
+    if(!acik){ hepsiAcik=false; }
+  });
+  document.getElementById('hepsiBtn').style.display=hepsiAcik?'none':'block';
+  document.getElementById('baslaBtn').textContent="🎴 Başla ("+gorevSayisi(mod)+" görev)";
+}
+
+function turDegis(k){
+  var acikSayi=0;
+  mevcutTurler(mod).forEach(function(t){ if(MOD_TURLER[mod][t.k]){ acikSayi++; } });
+  if(MOD_TURLER[mod][k] && acikSayi===1){
+    document.getElementById('uyari').textContent="En az bir tür açık kalmalı.";
+    return;
+  }
+  MOD_TURLER[mod][k]=!MOD_TURLER[mod][k];
+  document.getElementById('uyari').textContent="";
+  modTurleriKaydet();
+  turGuncelle();
+}
+
+function hepsiniAc(){
+  mevcutTurler(mod).forEach(function(t){ MOD_TURLER[mod][t.k]=true; });
+  document.getElementById('uyari').textContent="";
+  modTurleriKaydet();
+  turGuncelle();
+}
+
+/* ---------- Deste ve oyun ---------- */
+function karistir(d){
+  for(var i=d.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=d[i];d[i]=d[j];d[j]=t;
+  }
+  return d;
+}
+
+function yeniDeste(){
+  var liste=modGorevleri(mod).filter(function(g){return MOD_TURLER[mod][g[0]];}).map(function(g){return g[1];});
+  deste=karistir(liste);
+  if(deste.length>1 && deste[0]===sonKart){
+    var t=deste[0];deste[0]=deste[1];deste[1]=t;
+  }
+  sira=0;
+}
+
+function oyunuBaslat(){
+  oyuncuIdx=0; sonKart=""; ilk=true;
+  yeniDeste();
+  if(deste.length===0){
+    document.getElementById('uyari').textContent="Seçili türlerde görev yok. Bir tür aç.";
+    return;
+  }
+  var m=modBul(mod);
+  document.getElementById('modAdi').textContent=m.ikon+" "+m.ad;
+  document.getElementById('kart').textContent="Hazır olunca kart çek 👇";
+  document.getElementById('siraBilgi').textContent="";
+  document.getElementById('sayac').textContent="";
+  var kural=document.getElementById('kuralBilgi');
+  if(m.kural){
+    kural.textContent=m.kural;
+    kural.style.display="block";
+  }else{
+    kural.textContent="";
+    kural.style.display="none";
+  }
+  document.getElementById('cekBtn').textContent="🎴 Kart Çek";
+  document.getElementById('pasBtn').style.display="none";
+  goster('oyun');
+}
+
+function partnerBul(idx){
+  var o=OYUNCULAR[idx];
+  var ad=adaylar(idx);
+  if(typeof o.partner==='number'){
+    for(var k=0;k<ad.length;k++){
+      if(OYUNCULAR[ad[k]].id===o.partner){ return ad[k]; }
+    }
+  }
+  if(ad.length===0){
+    for(var j=0;j<OYUNCULAR.length;j++){
+      if(j!==idx){ ad.push(j); }
+    }
+  }
+  return ad[Math.floor(Math.random()*ad.length)];
+}
+
+function kartCek(pas){
+  var n=OYUNCULAR.length;
+  var m=modBul(mod);
+  if(!pas && !ilk){ oyuncuIdx=(oyuncuIdx+1)%n; }
+  ilk=false;
+  if(sira>=deste.length){ yeniDeste(); }
+  var gorev=deste[sira];
+  sira++;
+  sonKart=gorev;
+  var kart=document.getElementById('kart');
+  kart.classList.remove('cevir');
+  void kart.offsetWidth;
+  kart.textContent=gorev;
+  kart.classList.add('cevir');
+  if(m.kural){
+    document.getElementById('siraBilgi').textContent="Kartı okuyan: "+OYUNCULAR[oyuncuIdx].ad;
+  }else{
+    var partnerIdx=partnerBul(oyuncuIdx);
+    document.getElementById('siraBilgi').textContent="Sıra: "+OYUNCULAR[oyuncuIdx].ad+"  |  Partner: "+OYUNCULAR[partnerIdx].ad;
+  }
+  document.getElementById('sayac').textContent="Kart "+sira+" / "+deste.length;
+  document.getElementById('cekBtn').textContent=m.buton ? m.buton : "✅ Yaptık, Sonraki Kart";
+  document.getElementById('pasBtn').style.display="block";
+}
+
+/* ---------- Başlangıç ---------- */
+modTurleriYukle();
+modlariCiz();
+oyunculariYukle();
+oyunculariCiz();
+</script>
+</body>
+</html>
