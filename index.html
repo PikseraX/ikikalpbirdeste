@@ -133,12 +133,11 @@ var GOREVLER={
 };
 
 var MAX_OYUNCU=8;
+var PCINS_ETIKET={hepsi:"Her ikisi",kadin:"Kadın",erkek:"Erkek"};
 var sonId=0;
 function yeniId(){ sonId++; return sonId; }
-var OYUNCULAR=[
-  {id:yeniId(),ad:"",cins:"",partner:"rastgele"},
-  {id:yeniId(),ad:"",cins:"",partner:"rastgele"}
-];
+function yeniOyuncu(){ return {id:yeniId(),ad:"",cins:"",pcins:"hepsi",partner:"rastgele"}; }
+var OYUNCULAR=[yeniOyuncu(),yeniOyuncu()];
 var PARTNER_SECLER=[];
 var TURLER={sohbet:true,hareket:true,yakin:true};
 var mod="", deste=[], sira=0, oyuncuIdx=0, sonKart="", ilk=true;
@@ -173,7 +172,8 @@ function oyunculariYukle(){
         var id=a[i].id;
         if(typeof id!=='number' || idler[id]){ idGecerli=false; }
         idler[id]=true;
-        temiz.push({id:id,ad:a[i].ad.slice(0,16),cins:a[i].cins,partner:a[i].partner});
+        var pc=(a[i].pcins==="kadin" || a[i].pcins==="erkek") ? a[i].pcins : "hepsi";
+        temiz.push({id:id,ad:a[i].ad.slice(0,16),cins:a[i].cins,pcins:pc,partner:a[i].partner});
       }
     }
     if(temiz.length<2){ return; }
@@ -182,14 +182,8 @@ function oyunculariYukle(){
     }else{
       temiz.forEach(function(o){ if(o.id>sonId){ sonId=o.id; } });
     }
-    temiz.forEach(function(o){
-      var gecerli=false;
-      if(typeof o.partner==='number'){
-        temiz.forEach(function(x){ if(x.id===o.partner && x.id!==o.id){ gecerli=true; } });
-      }
-      if(!gecerli){ o.partner="rastgele"; }
-    });
     OYUNCULAR=temiz;
+    partnerleriDuzelt();
   }catch(e){}
 }
 function oyunculariKaydet(){
@@ -202,6 +196,32 @@ function goster(id){
   document.getElementById(id).classList.add('aktif');
 }
 
+/* ---------- Partner mantığı ---------- */
+function adaylar(idx){
+  var n=OYUNCULAR.length, liste=[];
+  var pc=OYUNCULAR[idx].pcins;
+  for(var j=0;j<n;j++){
+    if(j===idx){ continue; }
+    if(n===2 || pc==="hepsi" || OYUNCULAR[j].cins===pc){ liste.push(j); }
+  }
+  return liste;
+}
+
+function partnerleriDuzelt(){
+  for(var i=0;i<OYUNCULAR.length;i++){
+    var o=OYUNCULAR[i];
+    if(typeof o.partner==='number'){
+      var ad=adaylar(i), bulundu=false;
+      for(var k=0;k<ad.length;k++){
+        if(OYUNCULAR[ad[k]].id===o.partner){ bulundu=true; }
+      }
+      if(!bulundu){ o.partner="rastgele"; }
+    }else{
+      o.partner="rastgele";
+    }
+  }
+}
+
 /* ---------- Oyuncular ekranı ---------- */
 function gorunenAd(i){
   var ad=OYUNCULAR[i].ad.trim();
@@ -210,16 +230,17 @@ function gorunenAd(i){
 
 function partnerSecenekleriDoldur(sec,i){
   sec.innerHTML='';
-  OYUNCULAR.forEach(function(x,j){
-    if(j===i){ return; }
+  var ad=adaylar(i);
+  ad.forEach(function(j){
     var op=document.createElement('option');
-    op.value=String(x.id);
+    op.value=String(OYUNCULAR[j].id);
     op.textContent=gorunenAd(j);
     sec.appendChild(op);
   });
   var rast=document.createElement('option');
   rast.value="rastgele";
-  rast.textContent="🎲 Rastgele";
+  var pc=OYUNCULAR[i].pcins;
+  rast.textContent=(pc==="hepsi") ? "🎲 Rastgele" : "🎲 Rastgele ("+PCINS_ETIKET[pc]+")";
   sec.appendChild(rast);
   sec.value=String(OYUNCULAR[i].partner);
 }
@@ -266,14 +287,37 @@ function oyunculariCiz(){
       if(o.cins===s[0]){ op.selected=true; }
       sec.appendChild(op);
     });
-    sec.onchange=function(){ OYUNCULAR[i].cins=sec.value; };
+    sec.onchange=function(){
+      OYUNCULAR[i].cins=sec.value;
+      partnerleriDuzelt();
+      partnerleriYenile();
+    };
     kutu.appendChild(sec);
 
     if(OYUNCULAR.length>2){
-      var et=document.createElement('div');
-      et.className='etiket';
-      et.textContent='Partneri';
-      kutu.appendChild(et);
+      var et1=document.createElement('div');
+      et1.className='etiket';
+      et1.textContent='Partner cinsiyeti';
+      kutu.appendChild(et1);
+      var pcSec=document.createElement('select');
+      ["hepsi","kadin","erkek"].forEach(function(v){
+        var op=document.createElement('option');
+        op.value=v;
+        op.textContent=PCINS_ETIKET[v];
+        if(o.pcins===v){ op.selected=true; }
+        pcSec.appendChild(op);
+      });
+      pcSec.onchange=function(){
+        OYUNCULAR[i].pcins=pcSec.value;
+        partnerleriDuzelt();
+        partnerleriYenile();
+      };
+      kutu.appendChild(pcSec);
+
+      var et2=document.createElement('div');
+      et2.className='etiket';
+      et2.textContent='Partneri';
+      kutu.appendChild(et2);
       var ps=document.createElement('select');
       partnerSecenekleriDoldur(ps,i);
       ps.onchange=function(){
@@ -290,31 +334,36 @@ function oyunculariCiz(){
 
 function oyuncuEkle(){
   if(OYUNCULAR.length>=MAX_OYUNCU){ return; }
-  OYUNCULAR.push({id:yeniId(),ad:"",cins:"",partner:"rastgele"});
+  OYUNCULAR.push(yeniOyuncu());
   document.getElementById('oyuncuUyari').textContent="";
   oyunculariCiz();
 }
 
 function oyuncuSil(i){
   if(OYUNCULAR.length<=2){ return; }
-  var silinenId=OYUNCULAR[i].id;
   OYUNCULAR.splice(i,1);
-  OYUNCULAR.forEach(function(o){
-    if(o.partner===silinenId){ o.partner="rastgele"; }
-  });
+  partnerleriDuzelt();
   document.getElementById('oyuncuUyari').textContent="";
   oyunculariCiz();
 }
 
 function oyuncularKontrol(){
   var gorulen={};
-  for(var i=0;i<OYUNCULAR.length;i++){
+  var n=OYUNCULAR.length;
+  for(var i=0;i<n;i++){
     var ad=OYUNCULAR[i].ad.trim();
     if(ad===""){ return (i+1)+". oyuncunun adını yaz."; }
     if(OYUNCULAR[i].cins===""){ return ad+" için cinsiyet seç."; }
     var anahtar=ad.toLocaleLowerCase('tr');
     if(gorulen[anahtar]){ return "Aynı isim iki kez kullanılmış: "+ad+". İsimleri ayırt edilebilir yap."; }
     gorulen[anahtar]=true;
+  }
+  if(n>2){
+    for(var j=0;j<n;j++){
+      if(adaylar(j).length===0){
+        return OYUNCULAR[j].ad.trim()+" için seçtiğin partner cinsiyetinde ("+PCINS_ETIKET[OYUNCULAR[j].pcins]+") başka oyuncu yok. Partner cinsiyetini değiştir.";
+      }
+    }
   }
   return "";
 }
@@ -379,16 +428,18 @@ function modSec(ad){
 
 function partnerBul(idx){
   var o=OYUNCULAR[idx];
+  var ad=adaylar(idx);
   if(typeof o.partner==='number'){
-    for(var i=0;i<OYUNCULAR.length;i++){
-      if(OYUNCULAR[i].id===o.partner && i!==idx){ return i; }
+    for(var k=0;k<ad.length;k++){
+      if(OYUNCULAR[ad[k]].id===o.partner){ return ad[k]; }
     }
   }
-  var adaylar=[];
-  for(var j=0;j<OYUNCULAR.length;j++){
-    if(j!==idx){ adaylar.push(j); }
+  if(ad.length===0){
+    for(var j=0;j<OYUNCULAR.length;j++){
+      if(j!==idx){ ad.push(j); }
+    }
   }
-  return adaylar[Math.floor(Math.random()*adaylar.length)];
+  return ad[Math.floor(Math.random()*ad.length)];
 }
 
 function kartCek(pas){
