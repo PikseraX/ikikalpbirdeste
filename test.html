@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oyun Kontrolü</title>
+<style>
+body{font-family:-apple-system,Arial,sans-serif;background:#1a1025;color:#fff;padding:16px;font-size:15px;line-height:1.5}
+.ok{color:#4ade80}.hata{color:#f87171}
+</style>
+</head>
+<body>
+<h3>Oyun Kontrolü</h3>
+<div id="s">Kontrol ediliyor…</div>
+<script>
+var GOREVLER={};
+function ekle(m,l){GOREVLER[m]=(GOREVLER[m]||[]).concat(l);}
+var DOSYALAR=["romantik","eglenceli","beni-ne-kadar-taniyorsun","uzak-mesafe","evde-gece","yeni-tanisanlar","gelecek","ok-mu-nok-mu","ikisinden-birini-sec"];
+var cikti=[],sonHata={};
+function yaz(t,ok){cikti.push('<div class="'+(ok?'ok':'hata')+'">'+(ok?'✅ ':'❌ ')+t+'</div>');document.getElementById('s').innerHTML=cikti.join('');}
+window.onerror=function(m,src){var d=(src||'').split('/').pop().split('?')[0];sonHata[d]=m;};
+function indexKontrol(){
+fetch("index.html?t="+Date.now()).then(function(r){return r.text();}).then(function(t){
+yaz(t.indexOf("kartlar/romantik.js")>=0?"index.html yeni sürüm":"index.html ESKİ sürüm (kartlar klasörünü okumuyor)",t.indexOf("kartlar/romantik.js")>=0);
+yaz(t.indexOf("</html>")>0?"index.html sonuna kadar yüklenmiş":"index.html EKSİK, sonu yok",t.indexOf("</html>")>0);
+var re=/<script>([\s\S]*?)<\/script>/g,m,n=0,hata=false;
+while((m=re.exec(t))){n++;try{new Function(m[1]);}catch(e){hata=true;yaz(n+". kod bloğunda hata: "+e.message,false);}}
+if(!hata){yaz("index.html kodlarında söz dizimi hatası yok ("+n+" blok)",true);}
+}).catch(function(e){yaz("index.html okunamadı: "+e.message,false);});
+}
+var i=0;
+function sonraki(){
+if(i>=DOSYALAR.length){indexKontrol();return;}
+var ad=DOSYALAR[i++],onceki=Object.keys(GOREVLER).length,js=ad+".js";
+var s=document.createElement("script");
+s.src="kartlar/"+js+"?t="+Date.now();
+s.onload=function(){
+var k=Object.keys(GOREVLER);
+if(sonHata[js]){yaz("kartlar/"+js+" içinde hata: "+sonHata[js],false);}
+else if(k.length===onceki){yaz("kartlar/"+js+" yüklendi ama kart eklenmedi",false);}
+else{var mod=k[k.length-1];yaz("kartlar/"+js+" → "+mod+": "+GOREVLER[mod].length+" kart",true);}
+sonraki();};
+s.onerror=function(){yaz("kartlar/"+js+" bulunamadı (dosya yok ya da adı yanlış)",false);sonraki();};
+document.body.appendChild(s);
+}
+sonraki();
+</script>
+</body>
+</html>
