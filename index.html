@@ -22,14 +22,19 @@ p{margin:0;opacity:.8}
 button{width:100%;max-width:340px;padding:16px;border:0;border-radius:16px;font-size:1.1rem;font-weight:600;color:#fff;background:#7c3aed}
 button:active{opacity:.7}
 button.ikincil{background:#2d2040}
+button.kucuk{padding:10px;font-size:.9rem}
 .kart{width:100%;max-width:340px;min-height:200px;padding:28px;border-radius:24px;background:linear-gradient(145deg,#3b2a5c,#2d2040);border:2px solid #7c3aed;display:flex;align-items:center;justify-content:center;font-size:1.3rem;line-height:1.4}
 .kart.cevir{animation:cevir .45s ease}
 @keyframes cevir{0%{transform:rotateY(90deg);opacity:.2}100%{transform:rotateY(0);opacity:1}}
 @media (prefers-reduced-motion:reduce){.kart.cevir{animation:none}}
 .bilgi{font-size:.95rem;opacity:.7}
-.turler{display:flex;gap:8px;width:100%;max-width:340px}
-.tur{width:auto;flex:1;max-width:none;padding:12px 4px;font-size:.9rem;background:#2d2040;opacity:.55}
+.turler{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:340px}
+.tur{width:auto;max-width:none;padding:10px 2px;font-size:.78rem;background:#2d2040;opacity:.55;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tur .ik{font-size:1.35rem;line-height:1.2}
 .tur.acik{background:#7c3aed;opacity:1}
+.mod{display:flex;align-items:center;text-align:left;gap:12px}
+.mod .mik{font-size:1.6rem}
+.mod small{display:block;font-weight:400;opacity:.8;font-size:.8rem;margin-top:2px}
 .uyari{color:#fbbf24;opacity:1;min-height:1.2em}
 .oyuncu{width:100%;max-width:340px;padding:14px;border-radius:16px;background:#241836;border:1px solid #4b3a6e;display:flex;flex-direction:column;gap:10px;text-align:left}
 .satir{display:flex;gap:8px;align-items:center}
@@ -37,7 +42,7 @@ button.ikincil{background:#2d2040}
 .oyuncu input::placeholder{color:#9a8bb5}
 .etiket{font-size:.85rem;opacity:.7;margin:2px 0 -4px 2px}
 .sil{width:auto;flex:none;padding:12px 14px;background:#3b2a5c;font-size:1rem}
-#oyuncuListe{display:flex;flex-direction:column;gap:10px;width:100%;align-items:center}
+#oyuncuListe,#modListe{display:flex;flex-direction:column;gap:10px;width:100%;align-items:center}
 </style>
 </head>
 <body>
@@ -58,20 +63,20 @@ button.ikincil{background:#2d2040}
 </div>
 
 <div id="modlar" class="ekran">
-  <h2>Görev türleri</h2>
-  <div class="turler">
-    <button id="tur_sohbet" class="tur acik" onclick="turDegis('sohbet')">🗣️ Sohbet</button>
-    <button id="tur_hareket" class="tur acik" onclick="turDegis('hareket')">🎭 Hareket</button>
-    <button id="tur_yakin" class="tur acik" onclick="turDegis('yakin')">🤗 Yakınlık</button>
-  </div>
-  <p class="bilgi">İstemediğin türü kapat. Her kartta Pas Geç de var.</p>
-  <p id="uyari" class="bilgi uyari"></p>
   <h2>Bir mod seç</h2>
-  <button onclick="modSec('Romantik')">💕 Romantik</button>
-  <button onclick="modSec('Eğlenceli')">🎉 Eğlenceli</button>
-  <button onclick="modSec('Komik')">😂 Komik</button>
-  <button onclick="modSec('Samimi')">🫶 Samimi</button>
+  <div id="modListe"></div>
   <button class="ikincil" onclick="goster('oyuncular')">← Oyunculara dön</button>
+</div>
+
+<div id="turEkran" class="ekran">
+  <h2 id="turBaslik"></h2>
+  <p id="turAciklama" class="bilgi"></p>
+  <div id="turGrid" class="turler"></div>
+  <p class="bilgi">İstemediğin türü kapat. Her kartta Pas Geç de var.</p>
+  <button id="hepsiBtn" class="ikincil kucuk" style="display:none" onclick="hepsiniAc()">Hepsini aç</button>
+  <p id="uyari" class="bilgi uyari"></p>
+  <button id="baslaBtn" onclick="oyunuBaslat()">🎴 Başla</button>
+  <button class="ikincil" onclick="goster('modlar')">← Mod seçimine dön</button>
 </div>
 
 <div id="oyun" class="ekran">
@@ -81,54 +86,146 @@ button.ikincil{background:#2d2040}
   <div class="bilgi" id="sayac"></div>
   <button id="cekBtn" onclick="kartCek(false)">🎴 Kart Çek</button>
   <button id="pasBtn" class="ikincil" style="display:none" onclick="kartCek(true)">⏭️ Pas Geç</button>
-  <button class="ikincil" onclick="goster('modlar')">← Mod seçimine dön</button>
+  <button class="ikincil" onclick="turSayfasiAc(mod)">← Türleri değiştir</button>
+  <button class="ikincil" onclick="goster('modlar')">Mod değiştir</button>
 </div>
 
 <script>
+var TUR_LISTESI=[
+{k:"sohbet",e:"🗣️",ad:"Sohbet"},
+{k:"soru",e:"❓",ad:"Sorular"},
+{k:"itiraf",e:"❤️‍🔥",ad:"İtiraf"},
+{k:"tahmin",e:"🔮",ad:"Tahmin"},
+{k:"hareket",e:"🎭",ad:"Hareket"},
+{k:"yaratici",e:"🎨",ad:"Yaratıcı"},
+{k:"meydan",e:"⚡",ad:"Meydan"},
+{k:"yakin",e:"🤗",ad:"Yakınlık"}
+];
+
+var MODLAR=[
+{ad:"Romantik",ikon:"💕",aciklama:"Duygusal ve yakın anlar"},
+{ad:"Eğlenceli",ikon:"🎉",aciklama:"Oyun ve kahkaha dolu"},
+{ad:"Beni Ne Kadar Tanıyorsun",ikon:"🧠",aciklama:"Birbirinizi ne kadar bilirsiniz?"},
+{ad:"Uzak Mesafe",ikon:"✈️",aciklama:"Görüntülü konuşarak oynayın"},
+{ad:"Evde Gece",ikon:"🏡",aciklama:"Evde yapılacak keyifli şeyler"},
+{ad:"Yeni Tanışanlar",ikon:"🌱",aciklama:"Çekinmeden, hafif ve tatlı"},
+{ad:"Gelecek",ikon:"✨",aciklama:"Hayaller, planlar, hedefler"}
+];
+
 var GOREVLER={
 "Romantik":[
 ["sohbet","Partnerine ona aşık olduğun üç özelliğini söyle."],
-["yakin","30 saniye boyunca göz göze bakın, gülmemeye çalışın."],
 ["sohbet","Partnerine ilk karşılaştığınızda ne düşündüğünü anlat."],
-["yakin","Partnerinin elini tut ve en sevdiğin ortak anınızı anlat."],
 ["sohbet","Partnerine bugün seni en çok mutlu eden şeyi söyle."],
-["sohbet","Birlikte hayalini kurduğunuz bir tatili 1 dakikada anlatın."],
-["yakin","Partnerine sarıl ve 20 saniye bırakma."],
 ["sohbet","Partnerine içinden gelen tek bir güzel cümle söyle."],
-["hareket","Partnerine 2 cümlelik komik-romantik bir aşk mektubu oku."]
+["yakin","30 saniye boyunca göz göze bakın, gülmemeye çalışın."],
+["yakin","Partnerinin elini tut ve en sevdiğin ortak anınızı anlat."],
+["yakin","Partnerine sarıl ve 20 saniye bırakma."],
+["soru","Partnerine sor: Beni ilk ne zaman sevdiğini fark ettin?"],
+["soru","Partnerine sor: Hayatımızdan hangi günü tekrar yaşamak isterdin?"],
+["itiraf","Partnerine ilk buluşmanızda ne kadar heyecanlandığını itiraf et."],
+["itiraf","Partnerine ona hiç söylemediğin sevimli bir huyunu itiraf et."],
+["itiraf","Partnerine onu ilk özlediğin anı itiraf et."],
+["yaratici","Partnerine 2 cümlelik komik-romantik bir aşk mektubu oku."],
+["yaratici","Partnerin için 1 dakikada küçük bir kalp ya da sevgi notu çiz."],
+["hareket","Partnerine yavaş bir dans teklif et ve bir şarkı boyunca dans edin."],
+["meydan","30 saniyede partnerine olabildiğince çok iltifat et."]
 ],
 "Eğlenceli":[
 ["hareket","30 saniye boyunca partnerin için dans et."],
 ["hareket","Birbirinizin en iyi taklidini yapın."],
 ["hareket","Bir filmi sadece emojilerle anlat, partnerin tahmin etsin."],
-["yakin","Partnerinin sırtına parmakla bir şey çiz, o tahmin etsin."],
 ["hareket","Bir şarkıyı mırıldan, partnerin hangi şarkı olduğunu bulsun."],
-["hareket","Taş-kağıt-makas oynayın, kaybeden kazananın seçtiği komik bir hareketi yapsın."],
-["hareket","Aklından bir nesne tut, partnerin 5 evet/hayır sorusuyla bulmaya çalışsın."],
-["sohbet","Partnerine dört kelimelik bir şiir uydur."],
-["sohbet","Partnerinle ilgili aklına gelen en tuhaf soruyu sor."]
-],
-"Komik":[
-["hareket","En komik yüz ifadeni yap ve 10 saniye tut."],
-["hareket","Bir hayvan sesi çıkar, partnerin hangi hayvan olduğunu bilsin."],
-["hareket","Partnerinin sevimli bir huyunu şefkatle taklit et."],
-["hareket","Yanındaki bir eşyayı reklam spikeri gibi partnerine sat."],
 ["hareket","1 dakika boyunca robot gibi konuş."],
-["hareket","Bugün yaşadığın bir olayı haber spikeri gibi anlat."],
-["sohbet","Partnerine komik bir lakap bul ve bugün boyunca öyle seslen."],
-["hareket","Bir tekerleme uydur ve hızlıca üç kez söyle."]
+["meydan","Taş-kağıt-makas oynayın, kaybeden kazananın seçtiği komik bir hareketi yapsın."],
+["meydan","Aklından bir nesne tut, partnerin 5 evet/hayır sorusuyla bulmaya çalışsın."],
+["meydan","Bir dakikada sırayla hayvan adı sayın, tekrar eden kaybeder."],
+["meydan","Gülmeme yarışması: 30 saniye bakışın, ilk gülen komik bir hareket yapsın."],
+["yaratici","Sırayla kelime kelime bir hikaye uydurun, 10 kelimeye ulaşın."],
+["yaratici","Birlikte 1 dakikada kendi filminiz için bir afiş çizin ve adını koyun."],
+["soru","İkiniz de cevaplayın: Işınlanma mı, zamanda yolculuk mu? Nedenini söyleyin."],
+["soru","Partnerine sor: Bir günlüğüne görünmez olsan ilk ne yapardın?"],
+["itiraf","Gizlice yaptığın ama hiç söylemediğin en tuhaf alışkanlığını itiraf et."]
 ],
-"Samimi":[
-["sohbet","Partnerine seni en iyi anladığı anı anlat."],
-["sohbet","Birbirinize çocukluğunuzdan bir anı anlatın."],
-["sohbet","Partnerine ondan öğrendiğin bir şeyi söyle."],
-["sohbet","Birlikte yapmak istediğin yeni bir şeyi söyle."],
-["sohbet","Partnerine bu aralar nasıl hissettiğini sor ve dikkatle dinle."],
-["sohbet","İlişkinizde sizi en çok güldüren anı hatırlayın."],
-["sohbet","Partnerine ona minnettar olduğun bir şeyi söyle."],
-["sohbet","Gelecek yıl için ortak bir hedef belirleyin."],
-["yakin","1 dakika boyunca sessizce el ele oturun."],
-["yakin","Partnerine 1 dakika omuz masajı yap, sonra o sana yapsın."]
+"Beni Ne Kadar Tanıyorsun":[
+["tahmin","Partnerinin en sevdiği yemeği tahmin et, sonra doğru mu diye sor."],
+["tahmin","Partnerinin en sevdiği rengi, şarkıyı ve filmi tahmin et. Kaçını bildin?"],
+["tahmin","Partnerinin çocukken hayalini kurduğu mesleği tahmin et."],
+["tahmin","Partnerinin en büyük korkusunun ne olduğunu tahmin et."],
+["tahmin","Partnerinin bir günlüğüne her şeyi yapabilseydi ne yapacağını tahmin et."],
+["tahmin","Partnerinin en sevdiği tatil yerini tahmin et."],
+["tahmin","Partnerinin bugünkü ruh halini tek kelimeyle tahmin et."],
+["soru","Partnerine sor: Seninle ilgili en çok neyi bilmediğimi düşünüyorsun?"],
+["soru","Partnerine sor: Beni üç kelimeyle anlatsan ne derdin?"],
+["meydan","Aynı anda birbirinizin en sevdiği yemeği söyleyin, sonra doğru mu diye bakın."],
+["meydan","Partnerin hakkında 5 soruyu 1 dakikada cevapla, kaç doğru bildiğini say."],
+["itiraf","Partnerin hakkında yanlış bildiğini fark ettiğin bir şeyi itiraf et."],
+["sohbet","Partnerinden öğrendiğin en şaşırtıcı şeyi anlat."],
+["yaratici","Partnerin için bir kimlik kartı hazırla: adı, favori yemeği, favori şarkısı. O doğru mu desin."]
+],
+"Uzak Mesafe":[
+["sohbet","Bugün seni en çok güldüren şeyi anlat."],
+["sohbet","Bir sonraki buluşmanızda yapacağınız ilk şeyi söyle."],
+["soru","Partnerine sor: Seni en çok hangi anda özlüyorsun?"],
+["soru","Partnerine sor: Uzaktan birlikte yapabileceğimiz yeni bir aktivite ne olurdu?"],
+["itiraf","Partnerine onu en çok özlediğin anı itiraf et."],
+["itiraf","Uzaktayken yaptığın en tuhaf şeyi itiraf et."],
+["yaratici","Partnerin için kısa bir şiir yaz ve oku."],
+["yaratici","Bir kağıda partnerine mesaj yaz ve kameraya göster."],
+["yaratici","Partnerine bu akşam için küçük bir sürpriz mesaj hazırla ve gönder."],
+["hareket","Odandaki ilginç bir eşyayı göster ve hikayesini anlat."],
+["hareket","Kameraya kalp yapıp 10 saniye tut."],
+["meydan","1 dakikada çevrendeki en komik nesneyi bul ve göster. Hangisi daha komik oylayın."],
+["meydan","Aynı anda aynı şarkıyı açın ve 1 dakika birlikte dinleyin."],
+["yakin","30 saniye kameraya bakıp birbirinizin gözlerinin içine bakın."]
+],
+"Evde Gece":[
+["meydan","Evdeki malzemelerle 5 dakikada birlikte bir atıştırmalık hazırlayın."],
+["meydan","3 dakikada evde bir köşeyi toparlayın, kim daha çok toplamış sayın."],
+["meydan","Kağıt uçak yapın, en uzağa uçan kazansın."],
+["hareket","Bir şarkıda birlikte dans edin."],
+["hareket","Oturma odasında 1 dakikalık defile yapın."],
+["yaratici","Birlikte yastık ve battaniyelerden bir kale kurun."],
+["yaratici","Evdeki 5 malzemeyle birlikte bir tarif uydurun."],
+["yaratici","Bu akşam izleyeceğiniz film için bir afiş çizin."],
+["yakin","Partnerine 1 dakika omuz masajı yap, sonra o sana yapsın."],
+["yakin","Kanepede 2 dakika sessizce sarılın."],
+["sohbet","Bu akşam izlemek istediğiniz film için sırayla öneri yapın, bir tane seçin."],
+["sohbet","Evde sizin için en huzurlu köşeyi anlat."],
+["soru","Partnerine sor: Evde yapabileceğimiz en keyifli akşam nasıl olurdu?"],
+["itiraf","Evdeyken yaptığın en tuhaf alışkanlığını itiraf et."]
+],
+"Yeni Tanışanlar":[
+["sohbet","Kendini üç kelimeyle anlat."],
+["sohbet","Çocukken en sevdiğin oyunu anlat."],
+["sohbet","Hafta sonu ideal gününü anlat."],
+["soru","Partnerine sor: En sevdiği yemek ne ve neden?"],
+["soru","Partnerine sor: Hiç gitmediği ama gitmek istediği yer neresi?"],
+["soru","Partnerine sor: Seni en çok güldüren şey ne?"],
+["soru","Partnerine sor: Bir süper gücün olsa hangisi olurdu?"],
+["soru","Partnerine sor: Şu an dinlemek istediğin tek şarkı hangisi?"],
+["itiraf","Küçük bir itiraf: En sevdiğin ama biraz utandığın bir dizi ya da film hangisi?"],
+["itiraf","İlk buluşmada seni en çok heyecanlandıran şeyi itiraf et."],
+["hareket","En sevdiğin hayvanı taklit et, partnerin tahmin etsin."],
+["meydan","30 saniyede ortak 5 şey bulmaya çalışın."],
+["meydan","İkiniz aynı anda en sevdiğiniz rengi söyleyin. Aynı mı?"],
+["yaratici","Partnerini üç emojiyle anlat, o doğru mu desin."]
+],
+"Gelecek":[
+["sohbet","5 yıl sonra nerede yaşamak istediğini anlat."],
+["sohbet","Birlikte yapmak istediğin ilk büyük yolculuğu anlat."],
+["soru","Partnerine sor: 10 yıl sonra bizi nasıl görüyorsun?"],
+["soru","Partnerine sor: Hayalindeki ev nasıl?"],
+["soru","Partnerine sor: Birlikte öğrenmek istediğin yeni bir şey ne?"],
+["yaratici","Birlikte hayalinizdeki evi kağıda çizin."],
+["yaratici","Gelecekteki bir yıldönümünüz için kutlama planı yazın."],
+["yaratici","Birbirinize 5 yıl sonrasına kısa bir mektup yazın."],
+["meydan","30 saniyede birlikte yapmak istediğiniz 5 şeyi sayın."],
+["meydan","1 dakikada ortak bir hedef belirleyin."],
+["itiraf","Gelecek hakkında seni en çok heyecanlandıran ya da korkutan şeyi itiraf et."],
+["itiraf","Partnerine birlikte gelecekle ilgili hiç söylemediğin bir hayali itiraf et."],
+["hareket","5 yıl sonraki halini canlandır, partnerin tahmin etsin."],
+["sohbet","Birlikte yaşlandığınızda yapmak istediğiniz bir şeyi anlat."]
 ]
 };
 
@@ -139,27 +236,45 @@ function yeniId(){ sonId++; return sonId; }
 function yeniOyuncu(){ return {id:yeniId(),ad:"",cins:"",pcins:"hepsi",partner:"rastgele"}; }
 var OYUNCULAR=[yeniOyuncu(),yeniOyuncu()];
 var PARTNER_SECLER=[];
-var TURLER={sohbet:true,hareket:true,yakin:true};
+var MOD_TURLER={};
 var mod="", deste=[], sira=0, oyuncuIdx=0, sonKart="", ilk=true;
 
-/* ---------- Kayıt / yükleme ---------- */
-function turleriYukle(){
+/* ---------- Tür yardımcıları ---------- */
+function mevcutTurler(modAd){
+  return TUR_LISTESI.filter(function(t){
+    return GOREVLER[modAd].some(function(g){ return g[0]===t.k; });
+  });
+}
+
+function modTurleriYukle(){
+  var kayit={};
   try{
-    var k=localStorage.getItem('kartOyunTurler');
-    if(k){
-      var o=JSON.parse(k);
-      var acik=0;
-      for(var t in TURLER){ if(typeof o[t]==='boolean'){TURLER[t]=o[t];} if(TURLER[t]){acik++;} }
-      if(acik===0){ TURLER={sohbet:true,hareket:true,yakin:true}; }
-    }
-  }catch(e){}
-  for(var x in TURLER){
-    document.getElementById('tur_'+x).classList.toggle('acik',TURLER[x]);
-  }
+    var k=localStorage.getItem('kartOyunModTurler');
+    if(k){ kayit=JSON.parse(k)||{}; }
+  }catch(e){ kayit={}; }
+  MODLAR.forEach(function(m){
+    MOD_TURLER[m.ad]={};
+    var o=(kayit[m.ad] && typeof kayit[m.ad]==='object') ? kayit[m.ad] : {};
+    var acik=0;
+    var mt=mevcutTurler(m.ad);
+    mt.forEach(function(t){
+      var v=(typeof o[t.k]==='boolean') ? o[t.k] : true;
+      MOD_TURLER[m.ad][t.k]=v;
+      if(v){ acik++; }
+    });
+    if(acik===0){ mt.forEach(function(t){ MOD_TURLER[m.ad][t.k]=true; }); }
+  });
 }
-function turleriKaydet(){
-  try{ localStorage.setItem('kartOyunTurler',JSON.stringify(TURLER)); }catch(e){}
+
+function modTurleriKaydet(){
+  try{ localStorage.setItem('kartOyunModTurler',JSON.stringify(MOD_TURLER)); }catch(e){}
 }
+
+function gorevSayisi(modAd){
+  return GOREVLER[modAd].filter(function(g){ return MOD_TURLER[modAd][g[0]]; }).length;
+}
+
+/* ---------- Oyuncu kayıt ---------- */
 function oyunculariYukle(){
   try{
     var k=localStorage.getItem('kartOyunOyuncular');
@@ -377,18 +492,84 @@ function oyuncularDevam(){
   goster('modlar');
 }
 
-/* ---------- Görev türleri ---------- */
-function turDegis(t){
+/* ---------- Mod ekranı ---------- */
+function modlariCiz(){
+  var kap=document.getElementById('modListe');
+  kap.innerHTML='';
+  MODLAR.forEach(function(m){
+    var b=document.createElement('button');
+    b.className='mod';
+    var ik=document.createElement('span');
+    ik.className='mik';
+    ik.textContent=m.ikon;
+    var metin=document.createElement('span');
+    var baslik=document.createElement('span');
+    baslik.textContent=m.ad;
+    var alt=document.createElement('small');
+    alt.textContent=m.aciklama;
+    metin.appendChild(baslik);
+    metin.appendChild(alt);
+    b.appendChild(ik);
+    b.appendChild(metin);
+    b.onclick=function(){ turSayfasiAc(m.ad); };
+    kap.appendChild(b);
+  });
+}
+
+/* ---------- Tür seçim ekranı ---------- */
+function turSayfasiAc(ad){
+  mod=ad;
+  var m=MODLAR.filter(function(x){ return x.ad===ad; })[0];
+  document.getElementById('turBaslik').textContent=m.ikon+" "+m.ad;
+  document.getElementById('turAciklama').textContent="Bu mod için hangi görev türleri gelsin?";
+  document.getElementById('uyari').textContent="";
+  var kap=document.getElementById('turGrid');
+  kap.innerHTML='';
+  mevcutTurler(ad).forEach(function(t){
+    var b=document.createElement('button');
+    b.id='tur_'+t.k;
+    b.className='tur';
+    var ik=document.createElement('span');
+    ik.className='ik';
+    ik.textContent=t.e;
+    b.appendChild(ik);
+    b.appendChild(document.createTextNode(t.ad));
+    b.onclick=function(){ turDegis(t.k); };
+    kap.appendChild(b);
+  });
+  turGuncelle();
+  goster('turEkran');
+}
+
+function turGuncelle(){
+  var hepsiAcik=true;
+  mevcutTurler(mod).forEach(function(t){
+    var acik=MOD_TURLER[mod][t.k];
+    document.getElementById('tur_'+t.k).classList.toggle('acik',acik);
+    if(!acik){ hepsiAcik=false; }
+  });
+  document.getElementById('hepsiBtn').style.display=hepsiAcik?'none':'block';
+  document.getElementById('baslaBtn').textContent="🎴 Başla ("+gorevSayisi(mod)+" görev)";
+}
+
+function turDegis(k){
   var acikSayi=0;
-  for(var k in TURLER){ if(TURLER[k]) acikSayi++; }
-  if(TURLER[t] && acikSayi===1){
+  mevcutTurler(mod).forEach(function(t){ if(MOD_TURLER[mod][t.k]){ acikSayi++; } });
+  if(MOD_TURLER[mod][k] && acikSayi===1){
     document.getElementById('uyari').textContent="En az bir tür açık kalmalı.";
     return;
   }
-  TURLER[t]=!TURLER[t];
-  document.getElementById('tur_'+t).classList.toggle('acik',TURLER[t]);
+  MOD_TURLER[mod][k]=!MOD_TURLER[mod][k];
   document.getElementById('uyari').textContent="";
-  turleriKaydet();
+  modTurleriKaydet();
+  turGuncelle();
+}
+
+function hepsiniAc(){
+  mevcutTurler(mod).forEach(function(t){ MOD_TURLER[mod][t.k]=true; });
+  document.getElementById('uyari').textContent="";
+  modTurleriKaydet();
+  turGuncelle();
 }
 
 /* ---------- Deste ve oyun ---------- */
@@ -401,7 +582,7 @@ function karistir(d){
 }
 
 function yeniDeste(){
-  var liste=GOREVLER[mod].filter(function(g){return TURLER[g[0]];}).map(function(g){return g[1];});
+  var liste=GOREVLER[mod].filter(function(g){return MOD_TURLER[mod][g[0]];}).map(function(g){return g[1];});
   deste=karistir(liste);
   if(deste.length>1 && deste[0]===sonKart){
     var t=deste[0];deste[0]=deste[1];deste[1]=t;
@@ -409,15 +590,15 @@ function yeniDeste(){
   sira=0;
 }
 
-function modSec(ad){
-  mod=ad; oyuncuIdx=0; sonKart=""; ilk=true;
+function oyunuBaslat(){
+  oyuncuIdx=0; sonKart=""; ilk=true;
   yeniDeste();
   if(deste.length===0){
-    document.getElementById('uyari').textContent="Bu modda seçili türlerde görev yok. Başka tür aç veya başka mod seç.";
+    document.getElementById('uyari').textContent="Seçili türlerde görev yok. Bir tür aç.";
     return;
   }
-  document.getElementById('uyari').textContent="";
-  document.getElementById('modAdi').textContent=ad+" Mod";
+  var m=MODLAR.filter(function(x){ return x.ad===mod; })[0];
+  document.getElementById('modAdi').textContent=m.ikon+" "+m.ad;
   document.getElementById('kart').textContent="Hazır olunca kart çek 👇";
   document.getElementById('siraBilgi').textContent="";
   document.getElementById('sayac').textContent="";
@@ -463,7 +644,8 @@ function kartCek(pas){
 }
 
 /* ---------- Başlangıç ---------- */
-turleriYukle();
+modTurleriYukle();
+modlariCiz();
 oyunculariYukle();
 oyunculariCiz();
 </script>
