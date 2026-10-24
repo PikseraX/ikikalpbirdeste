@@ -35,6 +35,7 @@ button.ikincil{background:#2d2040}
 .satir{display:flex;gap:8px;align-items:center}
 .oyuncu input,.oyuncu select{width:100%;min-width:0;padding:14px;border-radius:12px;border:1px solid #4b3a6e;background:#2d2040;color:#fff;font-size:16px;font-family:inherit}
 .oyuncu input::placeholder{color:#9a8bb5}
+.etiket{font-size:.85rem;opacity:.7;margin:2px 0 -4px 2px}
 .sil{width:auto;flex:none;padding:12px 14px;background:#3b2a5c;font-size:1rem}
 #oyuncuListe{display:flex;flex-direction:column;gap:10px;width:100%;align-items:center}
 </style>
@@ -132,7 +133,13 @@ var GOREVLER={
 };
 
 var MAX_OYUNCU=8;
-var OYUNCULAR=[{ad:"",cins:""},{ad:"",cins:""}];
+var sonId=0;
+function yeniId(){ sonId++; return sonId; }
+var OYUNCULAR=[
+  {id:yeniId(),ad:"",cins:"",partner:"rastgele"},
+  {id:yeniId(),ad:"",cins:"",partner:"rastgele"}
+];
+var PARTNER_SECLER=[];
 var TURLER={sohbet:true,hareket:true,yakin:true};
 var mod="", deste=[], sira=0, oyuncuIdx=0, sonKart="", ilk=true;
 
@@ -157,18 +164,32 @@ function turleriKaydet(){
 function oyunculariYukle(){
   try{
     var k=localStorage.getItem('kartOyunOyuncular');
-    if(k){
-      var a=JSON.parse(k);
-      if(Array.isArray(a) && a.length>=2 && a.length<=MAX_OYUNCU){
-        var temiz=[];
-        for(var i=0;i<a.length;i++){
-          if(a[i] && typeof a[i].ad==='string' && typeof a[i].cins==='string'){
-            temiz.push({ad:a[i].ad.slice(0,16),cins:a[i].cins});
-          }
-        }
-        if(temiz.length>=2){ OYUNCULAR=temiz; }
+    if(!k){ return; }
+    var a=JSON.parse(k);
+    if(!Array.isArray(a) || a.length<2 || a.length>MAX_OYUNCU){ return; }
+    var temiz=[], idler={}, idGecerli=true;
+    for(var i=0;i<a.length;i++){
+      if(a[i] && typeof a[i].ad==='string' && typeof a[i].cins==='string'){
+        var id=a[i].id;
+        if(typeof id!=='number' || idler[id]){ idGecerli=false; }
+        idler[id]=true;
+        temiz.push({id:id,ad:a[i].ad.slice(0,16),cins:a[i].cins,partner:a[i].partner});
       }
     }
+    if(temiz.length<2){ return; }
+    if(!idGecerli){
+      temiz.forEach(function(o){ o.id=yeniId(); o.partner="rastgele"; });
+    }else{
+      temiz.forEach(function(o){ if(o.id>sonId){ sonId=o.id; } });
+    }
+    temiz.forEach(function(o){
+      var gecerli=false;
+      if(typeof o.partner==='number'){
+        temiz.forEach(function(x){ if(x.id===o.partner && x.id!==o.id){ gecerli=true; } });
+      }
+      if(!gecerli){ o.partner="rastgele"; }
+    });
+    OYUNCULAR=temiz;
   }catch(e){}
 }
 function oyunculariKaydet(){
@@ -182,9 +203,37 @@ function goster(id){
 }
 
 /* ---------- Oyuncular ekranı ---------- */
+function gorunenAd(i){
+  var ad=OYUNCULAR[i].ad.trim();
+  return ad!=="" ? ad : (i+1)+". oyuncu";
+}
+
+function partnerSecenekleriDoldur(sec,i){
+  sec.innerHTML='';
+  OYUNCULAR.forEach(function(x,j){
+    if(j===i){ return; }
+    var op=document.createElement('option');
+    op.value=String(x.id);
+    op.textContent=gorunenAd(j);
+    sec.appendChild(op);
+  });
+  var rast=document.createElement('option');
+  rast.value="rastgele";
+  rast.textContent="🎲 Rastgele";
+  sec.appendChild(rast);
+  sec.value=String(OYUNCULAR[i].partner);
+}
+
+function partnerleriYenile(){
+  for(var i=0;i<OYUNCULAR.length;i++){
+    if(PARTNER_SECLER[i]){ partnerSecenekleriDoldur(PARTNER_SECLER[i],i); }
+  }
+}
+
 function oyunculariCiz(){
   var kap=document.getElementById('oyuncuListe');
   kap.innerHTML='';
+  PARTNER_SECLER=[];
   OYUNCULAR.forEach(function(o,i){
     var kutu=document.createElement('div');
     kutu.className='oyuncu';
@@ -197,7 +246,7 @@ function oyunculariCiz(){
     inp.placeholder=(i+1)+'. oyuncunun adı';
     inp.value=o.ad;
     inp.setAttribute('autocomplete','off');
-    inp.oninput=function(){ OYUNCULAR[i].ad=inp.value; };
+    inp.oninput=function(){ OYUNCULAR[i].ad=inp.value; partnerleriYenile(); };
     ust.appendChild(inp);
     if(OYUNCULAR.length>2){
       var sil=document.createElement('button');
@@ -220,6 +269,20 @@ function oyunculariCiz(){
     sec.onchange=function(){ OYUNCULAR[i].cins=sec.value; };
     kutu.appendChild(sec);
 
+    if(OYUNCULAR.length>2){
+      var et=document.createElement('div');
+      et.className='etiket';
+      et.textContent='Partneri';
+      kutu.appendChild(et);
+      var ps=document.createElement('select');
+      partnerSecenekleriDoldur(ps,i);
+      ps.onchange=function(){
+        OYUNCULAR[i].partner=(ps.value==="rastgele") ? "rastgele" : Number(ps.value);
+      };
+      kutu.appendChild(ps);
+      PARTNER_SECLER[i]=ps;
+    }
+
     kap.appendChild(kutu);
   });
   document.getElementById('ekleBtn').style.display=(OYUNCULAR.length>=MAX_OYUNCU)?'none':'block';
@@ -227,19 +290,23 @@ function oyunculariCiz(){
 
 function oyuncuEkle(){
   if(OYUNCULAR.length>=MAX_OYUNCU){ return; }
-  OYUNCULAR.push({ad:"",cins:""});
+  OYUNCULAR.push({id:yeniId(),ad:"",cins:"",partner:"rastgele"});
   document.getElementById('oyuncuUyari').textContent="";
   oyunculariCiz();
 }
 
 function oyuncuSil(i){
   if(OYUNCULAR.length<=2){ return; }
+  var silinenId=OYUNCULAR[i].id;
   OYUNCULAR.splice(i,1);
+  OYUNCULAR.forEach(function(o){
+    if(o.partner===silinenId){ o.partner="rastgele"; }
+  });
   document.getElementById('oyuncuUyari').textContent="";
   oyunculariCiz();
 }
 
-function oyularDevamKontrol(){
+function oyuncularKontrol(){
   var gorulen={};
   for(var i=0;i<OYUNCULAR.length;i++){
     var ad=OYUNCULAR[i].ad.trim();
@@ -253,7 +320,7 @@ function oyularDevamKontrol(){
 }
 
 function oyuncularDevam(){
-  var hata=oyularDevamKontrol();
+  var hata=oyuncularKontrol();
   document.getElementById('oyuncuUyari').textContent=hata;
   if(hata!==""){ return; }
   for(var i=0;i<OYUNCULAR.length;i++){ OYUNCULAR[i].ad=OYUNCULAR[i].ad.trim(); }
@@ -310,6 +377,20 @@ function modSec(ad){
   goster('oyun');
 }
 
+function partnerBul(idx){
+  var o=OYUNCULAR[idx];
+  if(typeof o.partner==='number'){
+    for(var i=0;i<OYUNCULAR.length;i++){
+      if(OYUNCULAR[i].id===o.partner && i!==idx){ return i; }
+    }
+  }
+  var adaylar=[];
+  for(var j=0;j<OYUNCULAR.length;j++){
+    if(j!==idx){ adaylar.push(j); }
+  }
+  return adaylar[Math.floor(Math.random()*adaylar.length)];
+}
+
 function kartCek(pas){
   var n=OYUNCULAR.length;
   if(!pas && !ilk){ oyuncuIdx=(oyuncuIdx+1)%n; }
@@ -323,9 +404,8 @@ function kartCek(pas){
   void kart.offsetWidth;
   kart.textContent=gorev;
   kart.classList.add('cevir');
-  var sirali=OYUNCULAR[oyuncuIdx].ad;
-  var partner=OYUNCULAR[(oyuncuIdx+1)%n].ad;
-  document.getElementById('siraBilgi').textContent="Sıra: "+sirali+"  |  Partner: "+partner;
+  var partnerIdx=partnerBul(oyuncuIdx);
+  document.getElementById('siraBilgi').textContent="Sıra: "+OYUNCULAR[oyuncuIdx].ad+"  |  Partner: "+OYUNCULAR[partnerIdx].ad;
   document.getElementById('sayac').textContent="Kart "+sira+" / "+deste.length;
   document.getElementById('cekBtn').textContent="✅ Yaptık, Sonraki Kart";
   document.getElementById('pasBtn').style.display="block";
