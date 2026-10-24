@@ -15,6 +15,8 @@ p{margin:0;opacity:.8}
 button{width:100%;max-width:340px;padding:16px;border:0;border-radius:16px;font-size:1.1rem;font-weight:600;color:#fff;background:#7c3aed}
 button:active{opacity:.7}
 button.ikincil{background:#2d2040}
+.kart{width:100%;max-width:340px;min-height:200px;padding:28px;border-radius:24px;background:linear-gradient(145deg,#3b2a5c,#2d2040);border:2px solid #7c3aed;display:flex;align-items:center;justify-content:center;font-size:1.3rem;line-height:1.4}
+.bilgi{font-size:.95rem;opacity:.7}
 </style>
 </head>
 <body>
@@ -35,20 +37,106 @@ button.ikincil{background:#2d2040}
 </div>
 
 <div id="oyun" class="ekran">
-  <h2>Seçilen mod: <span id="modAdi"></span></h2>
-  <p>Kartlar bir sonraki aşamada eklenecek.</p>
+  <h2 id="modAdi"></h2>
+  <div class="bilgi" id="siraBilgi"></div>
+  <div class="kart" id="kart">Hazır olunca kart çek 👇</div>
+  <div class="bilgi" id="sayac"></div>
+  <button id="cekBtn" onclick="kartCek(false)">🎴 Kart Çek</button>
+  <button id="pasBtn" class="ikincil" style="display:none" onclick="kartCek(true)">⏭️ Pas Geç</button>
   <button class="ikincil" onclick="goster('modlar')">← Mod seçimine dön</button>
-  <button class="ikincil" onclick="goster('menu')">Ana menü</button>
 </div>
 
 <script>
+var GOREVLER={
+"Romantik":[
+"Partnerine ona aşık olduğun üç özelliğini söyle.",
+"30 saniye boyunca göz göze bakın, gülmemeye çalışın.",
+"Partnerine ilk karşılaştığınızda ne düşündüğünü anlat.",
+"Partnerinin elini tut ve en sevdiğin ortak anınızı anlat.",
+"Partnerine bugün seni en çok mutlu eden şeyi söyle.",
+"Birlikte hayalini kurduğunuz bir tatili 1 dakikada anlatın.",
+"Partnerine sarıl ve 20 saniye bırakma.",
+"Partnerine içinden gelen tek bir güzel cümle söyle."
+],
+"Eğlenceli":[
+"30 saniye boyunca partnerin için dans et.",
+"Birbirinizin en iyi taklidini yapın.",
+"Bir filmi sadece emojilerle anlat, partnerin tahmin etsin.",
+"Partnerinin sırtına parmakla bir şey çiz, o tahmin etsin.",
+"Bir şarkıyı mırıldan, partnerin hangi şarkı olduğunu bulsun.",
+"Taş-kağıt-makas oynayın, kaybeden kazananın seçtiği komik bir hareketi yapsın.",
+"Aklından bir nesne tut, partnerin 5 evet/hayır sorusuyla bulmaya çalışsın.",
+"Partnerine dört kelimelik bir şiir uydur."
+],
+"Komik":[
+"En komik yüz ifadeni yap ve 10 saniye tut.",
+"Bir hayvan sesi çıkar, partnerin hangi hayvan olduğunu bilsin.",
+"Partnerinin sevimli bir huyunu şefkatle taklit et.",
+"Yanındaki bir eşyayı reklam spikeri gibi partnerine sat.",
+"1 dakika boyunca robot gibi konuş.",
+"Bugün yaşadığın bir olayı haber spikeri gibi anlat.",
+"Partnerine komik bir lakap bul ve bugün boyunca öyle seslen.",
+"Bir tekerleme uydur ve hızlıca üç kez söyle."
+],
+"Samimi":[
+"Partnerine seni en iyi anladığı anı anlat.",
+"Birbirinize çocukluğunuzdan bir anı anlatın.",
+"Partnerine ondan öğrendiğin bir şeyi söyle.",
+"Birlikte yapmak istediğin yeni bir şeyi söyle.",
+"Partnerine bu aralar nasıl hissettiğini sor ve dikkatle dinle.",
+"İlişkinizde sizi en çok güldüren anı hatırlayın.",
+"Partnerine ona minnettar olduğun bir şeyi söyle.",
+"Gelecek yıl için ortak bir hedef belirleyin."
+]
+};
+
+var mod="", deste=[], sira=0, oyuncu=1, sonKart="", ilk=true;
+
 function goster(id){
   document.querySelectorAll('.ekran').forEach(function(e){e.classList.remove('aktif');});
   document.getElementById(id).classList.add('aktif');
 }
+
+function karistir(d){
+  for(var i=d.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=d[i];d[i]=d[j];d[j]=t;
+  }
+  return d;
+}
+
+function yeniDeste(){
+  deste=karistir(GOREVLER[mod].slice());
+  if(deste.length>1 && deste[0]===sonKart){
+    var t=deste[0];deste[0]=deste[1];deste[1]=t;
+  }
+  sira=0;
+}
+
 function modSec(ad){
-  document.getElementById('modAdi').textContent=ad;
+  mod=ad; oyuncu=1; sonKart=""; ilk=true;
+  yeniDeste();
+  document.getElementById('modAdi').textContent=ad+" Mod";
+  document.getElementById('kart').textContent="Hazır olunca kart çek 👇";
+  document.getElementById('siraBilgi').textContent="";
+  document.getElementById('sayac').textContent="";
+  document.getElementById('cekBtn').textContent="🎴 Kart Çek";
+  document.getElementById('pasBtn').style.display="none";
   goster('oyun');
+}
+
+function kartCek(pas){
+  if(!pas && !ilk){ oyuncu = (oyuncu===1) ? 2 : 1; }
+  ilk=false;
+  if(sira>=deste.length){ yeniDeste(); }
+  var gorev=deste[sira];
+  sira++;
+  sonKart=gorev;
+  document.getElementById('kart').textContent=gorev;
+  document.getElementById('siraBilgi').textContent="Sıra: "+oyuncu+". oyuncuda";
+  document.getElementById('sayac').textContent="Kart "+sira+" / "+deste.length;
+  document.getElementById('cekBtn').textContent="✅ Yaptık, Sonraki Kart";
+  document.getElementById('pasBtn').style.display="block";
 }
 </script>
 </body>
