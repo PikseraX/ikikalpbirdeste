@@ -17,6 +17,10 @@ button:active{opacity:.7}
 button.ikincil{background:#2d2040}
 .kart{width:100%;max-width:340px;min-height:200px;padding:28px;border-radius:24px;background:linear-gradient(145deg,#3b2a5c,#2d2040);border:2px solid #7c3aed;display:flex;align-items:center;justify-content:center;font-size:1.3rem;line-height:1.4}
 .bilgi{font-size:.95rem;opacity:.7}
+.turler{display:flex;gap:8px;width:100%;max-width:340px}
+.tur{width:auto;flex:1;max-width:none;padding:12px 4px;font-size:.9rem;background:#2d2040;opacity:.55}
+.tur.acik{background:#7c3aed;opacity:1}
+#uyari{color:#fbbf24;opacity:1;min-height:1.2em}
 </style>
 </head>
 <body>
@@ -28,6 +32,14 @@ button.ikincil{background:#2d2040}
 </div>
 
 <div id="modlar" class="ekran">
+  <h2>Görev türleri</h2>
+  <div class="turler">
+    <button id="tur_sohbet" class="tur acik" onclick="turDegis('sohbet')">🗣️ Sohbet</button>
+    <button id="tur_hareket" class="tur acik" onclick="turDegis('hareket')">🎭 Hareket</button>
+    <button id="tur_yakin" class="tur acik" onclick="turDegis('yakin')">🤗 Yakınlık</button>
+  </div>
+  <p class="bilgi">İstemediğin türü kapat. Her kartta Pas Geç de var.</p>
+  <p id="uyari" class="bilgi"></p>
   <h2>Bir mod seç</h2>
   <button onclick="modSec('Romantik')">💕 Romantik</button>
   <button onclick="modSec('Eğlenceli')">🎉 Eğlenceli</button>
@@ -49,52 +61,69 @@ button.ikincil{background:#2d2040}
 <script>
 var GOREVLER={
 "Romantik":[
-"Partnerine ona aşık olduğun üç özelliğini söyle.",
-"30 saniye boyunca göz göze bakın, gülmemeye çalışın.",
-"Partnerine ilk karşılaştığınızda ne düşündüğünü anlat.",
-"Partnerinin elini tut ve en sevdiğin ortak anınızı anlat.",
-"Partnerine bugün seni en çok mutlu eden şeyi söyle.",
-"Birlikte hayalini kurduğunuz bir tatili 1 dakikada anlatın.",
-"Partnerine sarıl ve 20 saniye bırakma.",
-"Partnerine içinden gelen tek bir güzel cümle söyle."
+["sohbet","Partnerine ona aşık olduğun üç özelliğini söyle."],
+["yakin","30 saniye boyunca göz göze bakın, gülmemeye çalışın."],
+["sohbet","Partnerine ilk karşılaştığınızda ne düşündüğünü anlat."],
+["yakin","Partnerinin elini tut ve en sevdiğin ortak anınızı anlat."],
+["sohbet","Partnerine bugün seni en çok mutlu eden şeyi söyle."],
+["sohbet","Birlikte hayalini kurduğunuz bir tatili 1 dakikada anlatın."],
+["yakin","Partnerine sarıl ve 20 saniye bırakma."],
+["sohbet","Partnerine içinden gelen tek bir güzel cümle söyle."],
+["hareket","Partnerine 2 cümlelik komik-romantik bir aşk mektubu oku."]
 ],
 "Eğlenceli":[
-"30 saniye boyunca partnerin için dans et.",
-"Birbirinizin en iyi taklidini yapın.",
-"Bir filmi sadece emojilerle anlat, partnerin tahmin etsin.",
-"Partnerinin sırtına parmakla bir şey çiz, o tahmin etsin.",
-"Bir şarkıyı mırıldan, partnerin hangi şarkı olduğunu bulsun.",
-"Taş-kağıt-makas oynayın, kaybeden kazananın seçtiği komik bir hareketi yapsın.",
-"Aklından bir nesne tut, partnerin 5 evet/hayır sorusuyla bulmaya çalışsın.",
-"Partnerine dört kelimelik bir şiir uydur."
+["hareket","30 saniye boyunca partnerin için dans et."],
+["hareket","Birbirinizin en iyi taklidini yapın."],
+["hareket","Bir filmi sadece emojilerle anlat, partnerin tahmin etsin."],
+["yakin","Partnerinin sırtına parmakla bir şey çiz, o tahmin etsin."],
+["hareket","Bir şarkıyı mırıldan, partnerin hangi şarkı olduğunu bulsun."],
+["hareket","Taş-kağıt-makas oynayın, kaybeden kazananın seçtiği komik bir hareketi yapsın."],
+["hareket","Aklından bir nesne tut, partnerin 5 evet/hayır sorusuyla bulmaya çalışsın."],
+["sohbet","Partnerine dört kelimelik bir şiir uydur."],
+["sohbet","Partnerinle ilgili aklına gelen en tuhaf soruyu sor."]
 ],
 "Komik":[
-"En komik yüz ifadeni yap ve 10 saniye tut.",
-"Bir hayvan sesi çıkar, partnerin hangi hayvan olduğunu bilsin.",
-"Partnerinin sevimli bir huyunu şefkatle taklit et.",
-"Yanındaki bir eşyayı reklam spikeri gibi partnerine sat.",
-"1 dakika boyunca robot gibi konuş.",
-"Bugün yaşadığın bir olayı haber spikeri gibi anlat.",
-"Partnerine komik bir lakap bul ve bugün boyunca öyle seslen.",
-"Bir tekerleme uydur ve hızlıca üç kez söyle."
+["hareket","En komik yüz ifadeni yap ve 10 saniye tut."],
+["hareket","Bir hayvan sesi çıkar, partnerin hangi hayvan olduğunu bilsin."],
+["hareket","Partnerinin sevimli bir huyunu şefkatle taklit et."],
+["hareket","Yanındaki bir eşyayı reklam spikeri gibi partnerine sat."],
+["hareket","1 dakika boyunca robot gibi konuş."],
+["hareket","Bugün yaşadığın bir olayı haber spikeri gibi anlat."],
+["sohbet","Partnerine komik bir lakap bul ve bugün boyunca öyle seslen."],
+["hareket","Bir tekerleme uydur ve hızlıca üç kez söyle."]
 ],
 "Samimi":[
-"Partnerine seni en iyi anladığı anı anlat.",
-"Birbirinize çocukluğunuzdan bir anı anlatın.",
-"Partnerine ondan öğrendiğin bir şeyi söyle.",
-"Birlikte yapmak istediğin yeni bir şeyi söyle.",
-"Partnerine bu aralar nasıl hissettiğini sor ve dikkatle dinle.",
-"İlişkinizde sizi en çok güldüren anı hatırlayın.",
-"Partnerine ona minnettar olduğun bir şeyi söyle.",
-"Gelecek yıl için ortak bir hedef belirleyin."
+["sohbet","Partnerine seni en iyi anladığı anı anlat."],
+["sohbet","Birbirinize çocukluğunuzdan bir anı anlatın."],
+["sohbet","Partnerine ondan öğrendiğin bir şeyi söyle."],
+["sohbet","Birlikte yapmak istediğin yeni bir şeyi söyle."],
+["sohbet","Partnerine bu aralar nasıl hissettiğini sor ve dikkatle dinle."],
+["sohbet","İlişkinizde sizi en çok güldüren anı hatırlayın."],
+["sohbet","Partnerine ona minnettar olduğun bir şeyi söyle."],
+["sohbet","Gelecek yıl için ortak bir hedef belirleyin."],
+["yakin","1 dakika boyunca sessizce el ele oturun."],
+["yakin","Partnerine 1 dakika omuz masajı yap, sonra o sana yapsın."]
 ]
 };
 
+var TURLER={sohbet:true,hareket:true,yakin:true};
 var mod="", deste=[], sira=0, oyuncu=1, sonKart="", ilk=true;
 
 function goster(id){
   document.querySelectorAll('.ekran').forEach(function(e){e.classList.remove('aktif');});
   document.getElementById(id).classList.add('aktif');
+}
+
+function turDegis(t){
+  var acikSayi=0;
+  for(var k in TURLER){ if(TURLER[k]) acikSayi++; }
+  if(TURLER[t] && acikSayi===1){
+    document.getElementById('uyari').textContent="En az bir tür açık kalmalı.";
+    return;
+  }
+  TURLER[t]=!TURLER[t];
+  document.getElementById('tur_'+t).classList.toggle('acik',TURLER[t]);
+  document.getElementById('uyari').textContent="";
 }
 
 function karistir(d){
@@ -106,7 +135,8 @@ function karistir(d){
 }
 
 function yeniDeste(){
-  deste=karistir(GOREVLER[mod].slice());
+  var liste=GOREVLER[mod].filter(function(g){return TURLER[g[0]];}).map(function(g){return g[1];});
+  deste=karistir(liste);
   if(deste.length>1 && deste[0]===sonKart){
     var t=deste[0];deste[0]=deste[1];deste[1]=t;
   }
@@ -116,6 +146,11 @@ function yeniDeste(){
 function modSec(ad){
   mod=ad; oyuncu=1; sonKart=""; ilk=true;
   yeniDeste();
+  if(deste.length===0){
+    document.getElementById('uyari').textContent="Bu modda seçili türlerde görev yok. Başka tür aç veya başka mod seç.";
+    return;
+  }
+  document.getElementById('uyari').textContent="";
   document.getElementById('modAdi').textContent=ad+" Mod";
   document.getElementById('kart').textContent="Hazır olunca kart çek 👇";
   document.getElementById('siraBilgi').textContent="";
