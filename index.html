@@ -83,6 +83,7 @@ button.kucuk{padding:10px;font-size:.9rem}
   <h2 id="modAdi"></h2>
   <div class="bilgi" id="siraBilgi"></div>
   <div class="kart" id="kart">Hazır olunca kart çek 👇</div>
+  <div class="bilgi" id="kuralBilgi" style="display:none"></div>
   <div class="bilgi" id="sayac"></div>
   <button id="cekBtn" onclick="kartCek(false)">🎴 Kart Çek</button>
   <button id="pasBtn" class="ikincil" style="display:none" onclick="kartCek(true)">⏭️ Pas Geç</button>
@@ -99,7 +100,13 @@ var TUR_LISTESI=[
 {k:"hareket",e:"🎭",ad:"Hareket"},
 {k:"yaratici",e:"🎨",ad:"Yaratıcı"},
 {k:"meydan",e:"⚡",ad:"Meydan"},
-{k:"yakin",e:"🤗",ad:"Yakınlık"}
+{k:"yakin",e:"🤗",ad:"Yakınlık"},
+{k:"gunluk",e:"🏠",ad:"Günlük"},
+{k:"sosyal",e:"📱",ad:"Sosyal"},
+{k:"aile",e:"👪",ad:"Çevre"},
+{k:"hayat",e:"🌍",ad:"Hayat"},
+{k:"ask",e:"💞",ad:"Aşk"},
+{k:"cilgin",e:"🤪",ad:"Çılgın"}
 ];
 
 var MODLAR=[
@@ -109,7 +116,9 @@ var MODLAR=[
 {ad:"Uzak Mesafe",ikon:"✈️",aciklama:"Görüntülü konuşarak oynayın"},
 {ad:"Evde Gece",ikon:"🏡",aciklama:"Evde yapılacak keyifli şeyler"},
 {ad:"Yeni Tanışanlar",ikon:"🌱",aciklama:"Çekinmeden, hafif ve tatlı"},
-{ad:"Gelecek",ikon:"✨",aciklama:"Hayaller, planlar, hedefler"}
+{ad:"Gelecek",ikon:"✨",aciklama:"Hayaller, planlar, hedefler"},
+{ad:"Ok mu Nok mu",ikon:"🚦",aciklama:"Bu durum sizce normal mi?",kural:"Birlikte sayın: 3, 2, 1! Aynı anda 👍 (OK) ya da 👎 (NOK) gösterin, sonra nedenini anlatın.",buton:"➡️ Sonraki Kart"},
+{ad:"İkisinden Birini Seç",ikon:"⚖️",aciklama:"Hangisini seçersin?",kural:"İkiniz de gizlice seçin, aynı anda söyleyin ve nedenini anlatın.",buton:"➡️ Sonraki Kart"}
 ];
 
 var GOREVLER={
@@ -229,6 +238,16 @@ var GOREVLER={
 ]
 };
 
+function ekle(modAd,liste){
+  if(!GOREVLER[modAd]){ GOREVLER[modAd]=[]; }
+  for(var i=0;i<liste.length;i++){ GOREVLER[modAd].push(liste[i]); }
+}
+</script>
+<script src="gorevler-yeni.js?v=1"></script>
+<script src="gorevler-2.js?v=1"></script>
+<script src="gorevler-3.js?v=1"></script>
+<script src="gorevler-4.js?v=1"></script>
+<script>
 var MAX_OYUNCU=8;
 var PCINS_ETIKET={hepsi:"Her ikisi",kadin:"Kadın",erkek:"Erkek"};
 var sonId=0;
@@ -239,10 +258,19 @@ var PARTNER_SECLER=[];
 var MOD_TURLER={};
 var mod="", deste=[], sira=0, oyuncuIdx=0, sonKart="", ilk=true;
 
-/* ---------- Tür yardımcıları ---------- */
+/* ---------- Yardımcılar ---------- */
+function modBul(ad){
+  return MODLAR.filter(function(x){ return x.ad===ad; })[0];
+}
+
+function modGorevleri(modAd){
+  return GOREVLER[modAd] || [];
+}
+
 function mevcutTurler(modAd){
+  var g=modGorevleri(modAd);
   return TUR_LISTESI.filter(function(t){
-    return GOREVLER[modAd].some(function(g){ return g[0]===t.k; });
+    return g.some(function(x){ return x[0]===t.k; });
   });
 }
 
@@ -271,7 +299,7 @@ function modTurleriKaydet(){
 }
 
 function gorevSayisi(modAd){
-  return GOREVLER[modAd].filter(function(g){ return MOD_TURLER[modAd][g[0]]; }).length;
+  return modGorevleri(modAd).filter(function(g){ return MOD_TURLER[modAd][g[0]]; }).length;
 }
 
 /* ---------- Oyuncu kayıt ---------- */
@@ -497,6 +525,7 @@ function modlariCiz(){
   var kap=document.getElementById('modListe');
   kap.innerHTML='';
   MODLAR.forEach(function(m){
+    if(modGorevleri(m.ad).length===0){ return; }
     var b=document.createElement('button');
     b.className='mod';
     var ik=document.createElement('span');
@@ -519,7 +548,7 @@ function modlariCiz(){
 /* ---------- Tür seçim ekranı ---------- */
 function turSayfasiAc(ad){
   mod=ad;
-  var m=MODLAR.filter(function(x){ return x.ad===ad; })[0];
+  var m=modBul(ad);
   document.getElementById('turBaslik').textContent=m.ikon+" "+m.ad;
   document.getElementById('turAciklama').textContent="Bu mod için hangi görev türleri gelsin?";
   document.getElementById('uyari').textContent="";
@@ -582,7 +611,7 @@ function karistir(d){
 }
 
 function yeniDeste(){
-  var liste=GOREVLER[mod].filter(function(g){return MOD_TURLER[mod][g[0]];}).map(function(g){return g[1];});
+  var liste=modGorevleri(mod).filter(function(g){return MOD_TURLER[mod][g[0]];}).map(function(g){return g[1];});
   deste=karistir(liste);
   if(deste.length>1 && deste[0]===sonKart){
     var t=deste[0];deste[0]=deste[1];deste[1]=t;
@@ -597,11 +626,19 @@ function oyunuBaslat(){
     document.getElementById('uyari').textContent="Seçili türlerde görev yok. Bir tür aç.";
     return;
   }
-  var m=MODLAR.filter(function(x){ return x.ad===mod; })[0];
+  var m=modBul(mod);
   document.getElementById('modAdi').textContent=m.ikon+" "+m.ad;
   document.getElementById('kart').textContent="Hazır olunca kart çek 👇";
   document.getElementById('siraBilgi').textContent="";
   document.getElementById('sayac').textContent="";
+  var kural=document.getElementById('kuralBilgi');
+  if(m.kural){
+    kural.textContent=m.kural;
+    kural.style.display="block";
+  }else{
+    kural.textContent="";
+    kural.style.display="none";
+  }
   document.getElementById('cekBtn').textContent="🎴 Kart Çek";
   document.getElementById('pasBtn').style.display="none";
   goster('oyun');
@@ -625,6 +662,7 @@ function partnerBul(idx){
 
 function kartCek(pas){
   var n=OYUNCULAR.length;
+  var m=modBul(mod);
   if(!pas && !ilk){ oyuncuIdx=(oyuncuIdx+1)%n; }
   ilk=false;
   if(sira>=deste.length){ yeniDeste(); }
@@ -636,10 +674,14 @@ function kartCek(pas){
   void kart.offsetWidth;
   kart.textContent=gorev;
   kart.classList.add('cevir');
-  var partnerIdx=partnerBul(oyuncuIdx);
-  document.getElementById('siraBilgi').textContent="Sıra: "+OYUNCULAR[oyuncuIdx].ad+"  |  Partner: "+OYUNCULAR[partnerIdx].ad;
+  if(m.kural){
+    document.getElementById('siraBilgi').textContent="Kartı okuyan: "+OYUNCULAR[oyuncuIdx].ad;
+  }else{
+    var partnerIdx=partnerBul(oyuncuIdx);
+    document.getElementById('siraBilgi').textContent="Sıra: "+OYUNCULAR[oyuncuIdx].ad+"  |  Partner: "+OYUNCULAR[partnerIdx].ad;
+  }
   document.getElementById('sayac').textContent="Kart "+sira+" / "+deste.length;
-  document.getElementById('cekBtn').textContent="✅ Yaptık, Sonraki Kart";
+  document.getElementById('cekBtn').textContent=m.buton ? m.buton : "✅ Yaptık, Sonraki Kart";
   document.getElementById('pasBtn').style.display="block";
 }
 
