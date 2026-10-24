@@ -30,7 +30,13 @@ button.ikincil{background:#2d2040}
 .turler{display:flex;gap:8px;width:100%;max-width:340px}
 .tur{width:auto;flex:1;max-width:none;padding:12px 4px;font-size:.9rem;background:#2d2040;opacity:.55}
 .tur.acik{background:#7c3aed;opacity:1}
-#uyari{color:#fbbf24;opacity:1;min-height:1.2em}
+.uyari{color:#fbbf24;opacity:1;min-height:1.2em}
+.oyuncu{width:100%;max-width:340px;padding:14px;border-radius:16px;background:#241836;border:1px solid #4b3a6e;display:flex;flex-direction:column;gap:10px;text-align:left}
+.satir{display:flex;gap:8px;align-items:center}
+.oyuncu input,.oyuncu select{width:100%;min-width:0;padding:14px;border-radius:12px;border:1px solid #4b3a6e;background:#2d2040;color:#fff;font-size:16px;font-family:inherit}
+.oyuncu input::placeholder{color:#9a8bb5}
+.sil{width:auto;flex:none;padding:12px 14px;background:#3b2a5c;font-size:1rem}
+#oyuncuListe{display:flex;flex-direction:column;gap:10px;width:100%;align-items:center}
 </style>
 </head>
 <body>
@@ -38,7 +44,16 @@ button.ikincil{background:#2d2040}
 <div id="menu" class="ekran aktif">
   <h1>💜 Kart Oyunu</h1>
   <p>Kart çek, görevi yap, birlikte eğlen.</p>
-  <button onclick="goster('modlar')">Oyuna Başla</button>
+  <button onclick="goster('oyuncular')">Oyuna Başla</button>
+</div>
+
+<div id="oyuncular" class="ekran">
+  <h2>Kimler oynuyor?</h2>
+  <div id="oyuncuListe"></div>
+  <button id="ekleBtn" class="ikincil" onclick="oyuncuEkle()">＋ Yeni oyuncu ekle</button>
+  <p id="oyuncuUyari" class="bilgi uyari"></p>
+  <button onclick="oyuncularDevam()">Devam Et</button>
+  <button class="ikincil" onclick="goster('menu')">← Geri</button>
 </div>
 
 <div id="modlar" class="ekran">
@@ -49,13 +64,13 @@ button.ikincil{background:#2d2040}
     <button id="tur_yakin" class="tur acik" onclick="turDegis('yakin')">🤗 Yakınlık</button>
   </div>
   <p class="bilgi">İstemediğin türü kapat. Her kartta Pas Geç de var.</p>
-  <p id="uyari" class="bilgi"></p>
+  <p id="uyari" class="bilgi uyari"></p>
   <h2>Bir mod seç</h2>
   <button onclick="modSec('Romantik')">💕 Romantik</button>
   <button onclick="modSec('Eğlenceli')">🎉 Eğlenceli</button>
   <button onclick="modSec('Komik')">😂 Komik</button>
   <button onclick="modSec('Samimi')">🫶 Samimi</button>
-  <button class="ikincil" onclick="goster('menu')">← Geri</button>
+  <button class="ikincil" onclick="goster('oyuncular')">← Oyunculara dön</button>
 </div>
 
 <div id="oyun" class="ekran">
@@ -116,9 +131,12 @@ var GOREVLER={
 ]
 };
 
+var MAX_OYUNCU=8;
+var OYUNCULAR=[{ad:"",cins:""},{ad:"",cins:""}];
 var TURLER={sohbet:true,hareket:true,yakin:true};
-var mod="", deste=[], sira=0, oyuncu=1, sonKart="", ilk=true;
+var mod="", deste=[], sira=0, oyuncuIdx=0, sonKart="", ilk=true;
 
+/* ---------- Kayıt / yükleme ---------- */
 function turleriYukle(){
   try{
     var k=localStorage.getItem('kartOyunTurler');
@@ -133,16 +151,117 @@ function turleriYukle(){
     document.getElementById('tur_'+x).classList.toggle('acik',TURLER[x]);
   }
 }
-
 function turleriKaydet(){
   try{ localStorage.setItem('kartOyunTurler',JSON.stringify(TURLER)); }catch(e){}
 }
+function oyunculariYukle(){
+  try{
+    var k=localStorage.getItem('kartOyunOyuncular');
+    if(k){
+      var a=JSON.parse(k);
+      if(Array.isArray(a) && a.length>=2 && a.length<=MAX_OYUNCU){
+        var temiz=[];
+        for(var i=0;i<a.length;i++){
+          if(a[i] && typeof a[i].ad==='string' && typeof a[i].cins==='string'){
+            temiz.push({ad:a[i].ad.slice(0,16),cins:a[i].cins});
+          }
+        }
+        if(temiz.length>=2){ OYUNCULAR=temiz; }
+      }
+    }
+  }catch(e){}
+}
+function oyunculariKaydet(){
+  try{ localStorage.setItem('kartOyunOyuncular',JSON.stringify(OYUNCULAR)); }catch(e){}
+}
 
+/* ---------- Ekran geçişi ---------- */
 function goster(id){
   document.querySelectorAll('.ekran').forEach(function(e){e.classList.remove('aktif');});
   document.getElementById(id).classList.add('aktif');
 }
 
+/* ---------- Oyuncular ekranı ---------- */
+function oyunculariCiz(){
+  var kap=document.getElementById('oyuncuListe');
+  kap.innerHTML='';
+  OYUNCULAR.forEach(function(o,i){
+    var kutu=document.createElement('div');
+    kutu.className='oyuncu';
+
+    var ust=document.createElement('div');
+    ust.className='satir';
+    var inp=document.createElement('input');
+    inp.type='text';
+    inp.maxLength=16;
+    inp.placeholder=(i+1)+'. oyuncunun adı';
+    inp.value=o.ad;
+    inp.setAttribute('autocomplete','off');
+    inp.oninput=function(){ OYUNCULAR[i].ad=inp.value; };
+    ust.appendChild(inp);
+    if(OYUNCULAR.length>2){
+      var sil=document.createElement('button');
+      sil.className='sil';
+      sil.textContent='✕';
+      sil.onclick=function(){ oyuncuSil(i); };
+      ust.appendChild(sil);
+    }
+    kutu.appendChild(ust);
+
+    var sec=document.createElement('select');
+    var secenekler=[["","Cinsiyet seç"],["kadin","Kadın"],["erkek","Erkek"],["belirtmem","Belirtmek istemiyorum"]];
+    secenekler.forEach(function(s){
+      var op=document.createElement('option');
+      op.value=s[0];
+      op.textContent=s[1];
+      if(o.cins===s[0]){ op.selected=true; }
+      sec.appendChild(op);
+    });
+    sec.onchange=function(){ OYUNCULAR[i].cins=sec.value; };
+    kutu.appendChild(sec);
+
+    kap.appendChild(kutu);
+  });
+  document.getElementById('ekleBtn').style.display=(OYUNCULAR.length>=MAX_OYUNCU)?'none':'block';
+}
+
+function oyuncuEkle(){
+  if(OYUNCULAR.length>=MAX_OYUNCU){ return; }
+  OYUNCULAR.push({ad:"",cins:""});
+  document.getElementById('oyuncuUyari').textContent="";
+  oyunculariCiz();
+}
+
+function oyuncuSil(i){
+  if(OYUNCULAR.length<=2){ return; }
+  OYUNCULAR.splice(i,1);
+  document.getElementById('oyuncuUyari').textContent="";
+  oyunculariCiz();
+}
+
+function oyularDevamKontrol(){
+  var gorulen={};
+  for(var i=0;i<OYUNCULAR.length;i++){
+    var ad=OYUNCULAR[i].ad.trim();
+    if(ad===""){ return (i+1)+". oyuncunun adını yaz."; }
+    if(OYUNCULAR[i].cins===""){ return ad+" için cinsiyet seç."; }
+    var anahtar=ad.toLocaleLowerCase('tr');
+    if(gorulen[anahtar]){ return "Aynı isim iki kez kullanılmış: "+ad+". İsimleri ayırt edilebilir yap."; }
+    gorulen[anahtar]=true;
+  }
+  return "";
+}
+
+function oyuncularDevam(){
+  var hata=oyularDevamKontrol();
+  document.getElementById('oyuncuUyari').textContent=hata;
+  if(hata!==""){ return; }
+  for(var i=0;i<OYUNCULAR.length;i++){ OYUNCULAR[i].ad=OYUNCULAR[i].ad.trim(); }
+  oyunculariKaydet();
+  goster('modlar');
+}
+
+/* ---------- Görev türleri ---------- */
 function turDegis(t){
   var acikSayi=0;
   for(var k in TURLER){ if(TURLER[k]) acikSayi++; }
@@ -156,6 +275,7 @@ function turDegis(t){
   turleriKaydet();
 }
 
+/* ---------- Deste ve oyun ---------- */
 function karistir(d){
   for(var i=d.length-1;i>0;i--){
     var j=Math.floor(Math.random()*(i+1));
@@ -174,7 +294,7 @@ function yeniDeste(){
 }
 
 function modSec(ad){
-  mod=ad; oyuncu=1; sonKart=""; ilk=true;
+  mod=ad; oyuncuIdx=0; sonKart=""; ilk=true;
   yeniDeste();
   if(deste.length===0){
     document.getElementById('uyari').textContent="Bu modda seçili türlerde görev yok. Başka tür aç veya başka mod seç.";
@@ -191,7 +311,8 @@ function modSec(ad){
 }
 
 function kartCek(pas){
-  if(!pas && !ilk){ oyuncu = (oyuncu===1) ? 2 : 1; }
+  var n=OYUNCULAR.length;
+  if(!pas && !ilk){ oyuncuIdx=(oyuncuIdx+1)%n; }
   ilk=false;
   if(sira>=deste.length){ yeniDeste(); }
   var gorev=deste[sira];
@@ -202,13 +323,18 @@ function kartCek(pas){
   void kart.offsetWidth;
   kart.textContent=gorev;
   kart.classList.add('cevir');
-  document.getElementById('siraBilgi').textContent="Sıra: "+oyuncu+". oyuncuda";
+  var sirali=OYUNCULAR[oyuncuIdx].ad;
+  var partner=OYUNCULAR[(oyuncuIdx+1)%n].ad;
+  document.getElementById('siraBilgi').textContent="Sıra: "+sirali+"  |  Partner: "+partner;
   document.getElementById('sayac').textContent="Kart "+sira+" / "+deste.length;
   document.getElementById('cekBtn').textContent="✅ Yaptık, Sonraki Kart";
   document.getElementById('pasBtn').style.display="block";
 }
 
+/* ---------- Başlangıç ---------- */
 turleriYukle();
+oyunculariYukle();
+oyunculariCiz();
 </script>
 </body>
 </html>
