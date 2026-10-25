@@ -141,4 +141,74 @@ if(doldu&&!uyarildi){uyarildi=true;bitti();}
 else if(!doldu){uyarildi=false;}
 }).observe(b,{childList:true,characterData:true,subtree:true});
 })();
+/* Tür renkleri, oyun özeti ve geri bildirim */
+(function(){
+var GERI_EPOSTA="BURAYA-E-POSTA-YAZ";
+var d=document;
+function el(i){return d.getElementById(i);}
+var RENK={sohbet:"#38bdf8",soru:"#fbbf24",itiraf:"#f43f5e",tahmin:"#a78bfa",hareket:"#fb923c",yaratici:"#34d399",meydan:"#facc15",yakin:"#f472b6",gunluk:"#94a3b8",sosyal:"#60a5fa",aile:"#f59e0b",hayat:"#2dd4bf",ask:"#fb7185",cilgin:"#c084fc",kendi:"#e879f9"};
+function turBilgi(k){
+if(k==="kendi")return {e:"✍️",ad:"Kendi kartın"};
+for(var i=0;i<TUR_LISTESI.length;i++){if(TUR_LISTESI[i].k===k)return TUR_LISTESI[i];}
+return {e:"🎴",ad:""};}
+function turBul(t){var l=GOREVLER[mod]||[];for(var i=0;i<l.length;i++){if(l[i][1]===t)return l[i][0];}return "kendi";}
+var kart=el("kart"),tl=d.createElement("div");
+tl.id="turEtiket";tl.style.cssText="display:none;font-size:.85rem;font-weight:700";
+kart.insertAdjacentElement("beforebegin",tl);
+function renkSifirla(){kart.style.borderColor="";kart.style.boxShadow="";tl.style.display="none";}
+function renkUygula(k){var r=RENK[k]||"#7c3aed",b=turBilgi(k);kart.style.borderColor=r;kart.style.boxShadow="0 0 18px "+r+"55";tl.style.color=r;tl.textContent=b.e+" "+b.ad;tl.style.display="block";}
+var bas=0,tam=0,pasS=0,giz=0,turSay={},oyTam={},sonTur="",gDon="menu";
+function sifirla(){bas=Date.now();tam=0;pasS=0;giz=0;turSay={};oyTam={};sonTur="";}
+var ob=window.oyunuBaslat;
+window.oyunuBaslat=function(){ob();sifirla();renkSifirla();};
+var ek=window.kartCek;
+window.kartCek=function(pas,not){
+var ilkMi=ilk,onceki=OYUNCULAR[oyuncuIdx]?OYUNCULAR[oyuncuIdx].ad:"",oncekiTur=sonTur;
+ek(pas,not);
+if(!pas){if(!ilkMi){tam++;if(oncekiTur){turSay[oncekiTur]=(turSay[oncekiTur]||0)+1;}oyTam[onceki]=(oyTam[onceki]||0)+1;}}
+else if(not){giz++;}else{pasS++;}
+if(el("cekBtn").style.display==="none"){renkSifirla();sonTur="";}
+else{sonTur=turBul(sonKart);renkUygula(sonTur);}
+};
+/* Oyun özeti */
+var oz=d.createElement("div");oz.id="ozet";oz.className="ekran";
+oz.innerHTML='<h2>🎉 Oyun Özeti</h2><p id="ozetMod" class="bilgi"></p><div id="ozetIcerik" style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:340px"></div><p id="ozetNot" class="bilgi"></p><button id="ozTekrar">🔁 Yeniden oyna</button><button id="ozMod" class="ikincil">Mod değiştir</button><button id="ozGeri" class="ikincil">💬 Geri bildirim</button><button id="ozMenu" class="ikincil">Ana menü</button>';
+d.body.appendChild(oz);
+function satir(a,b){var r=d.createElement("div"),x=d.createElement("span"),y=d.createElement("strong");r.className="kitem";x.textContent=a;y.textContent=b;r.appendChild(x);r.appendChild(y);el("ozetIcerik").appendChild(r);}
+function ozetAc(){
+el("ozetIcerik").innerHTML="";
+var m=modBul(mod);el("ozetMod").textContent=m.ikon+" "+m.ad;
+satir("🕒 Süre",Math.max(1,Math.round((Date.now()-bas)/60000))+" dk");
+satir("✅ Tamamlanan",String(tam));satir("⏭️ Atlanan",String(pasS));satir("🚫 Gizlenen",String(giz));
+var en="",say=0;for(var k in turSay){if(turSay[k]>say){say=turSay[k];en=k;}}
+if(en){var b=turBilgi(en);satir("🏆 En çok gelen tür",b.e+" "+b.ad+" ("+say+")");}
+OYUNCULAR.forEach(function(o){satir("👤 "+o.ad,(oyTam[o.ad]||0)+" kart");});
+el("ozetNot").textContent=tam?"Güzel oyundu! Bir sonraki oyunda görüşürüz 💜":"Henüz hiç kart tamamlanmadı. “Yaptık” dediğin kartlar burada sayılır.";
+goster("ozet");}
+var bt=d.createElement("button");bt.className="ikincil kucuk";bt.textContent="🏁 Oyunu bitir";bt.onclick=ozetAc;
+el("gizleBtn").insertAdjacentElement("afterend",bt);
+el("ozTekrar").onclick=function(){oyunuBaslat();};
+el("ozMod").onclick=function(){goster("modlar");};
+el("ozMenu").onclick=function(){goster("menu");};
+el("ozGeri").onclick=function(){gbAc("ozet");};
+/* Geri bildirim */
+var gi=d.createElement("div");gi.id="geriEkran";gi.className="ekran";
+gi.innerHTML='<h2>💬 Geri bildirim</h2><p class="bilgi">Önerini ya da bulduğun hatayı yaz. E-posta uygulaman hazır bir mesajla açılır, sen gönderirsin.</p><div class="oyuncu"><select id="gTur"><option>💡 Öneri</option><option>🐞 Hata</option><option>🃏 Kart önerisi</option><option>❤️ Beğendim</option></select><textarea id="gMetin" maxlength="500" rows="5" placeholder="Mesajını yaz…" style="width:100%;padding:14px;border-radius:12px;border:1px solid #4b3a6e;background:#2d2040;color:#fff;font-size:16px;font-family:inherit;resize:vertical"></textarea></div><p id="gUyari" class="bilgi uyari"></p><button id="gGonder">📨 Gönder</button><button id="gKopya" class="ikincil">📋 Metni kopyala</button><button id="gGeri" class="ikincil">← Geri</button>';
+d.body.appendChild(gi);
+function gbAc(n){gDon=n;el("gUyari").textContent="";goster("geriEkran");}
+function govde(){var t=el("gMetin").value.trim();if(!t){el("gUyari").textContent="Önce mesajını yaz.";return "";}return el("gTur").value+"\n\n"+t+"\n\n— Mod: "+(mod||"-");}
+el("gGonder").onclick=function(){
+var g=govde();if(!g)return;
+if(GERI_EPOSTA.indexOf("@")<1){el("gUyari").textContent="Kodun başındaki e-posta adresi henüz değiştirilmemiş.";return;}
+el("gUyari").textContent="";
+location.href="mailto:"+GERI_EPOSTA+"?subject="+encodeURIComponent("Kart Oyunu geri bildirim")+"&body="+encodeURIComponent(g);};
+el("gKopya").onclick=function(){
+var g=govde();if(!g)return;
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(g).then(function(){el("gUyari").textContent="Kopyalandı. İstediğin yere yapıştırabilirsin.";}).catch(function(){el("gUyari").textContent="Kopyalanamadı, metni elle seçip kopyala.";});}
+else{el("gUyari").textContent="Kopyalanamadı, metni elle seçip kopyala.";}};
+el("gGeri").onclick=function(){goster(gDon);};
+var mb=d.createElement("button");mb.className="ikincil";mb.textContent="💬 Geri bildirim";mb.onclick=function(){gbAc("menu");};
+el("menu").appendChild(mb);
+})();
+
 
