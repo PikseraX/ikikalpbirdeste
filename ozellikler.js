@@ -143,7 +143,7 @@ else if(!doldu){uyarildi=false;}
 })();
 /* Tür renkleri, oyun özeti ve geri bildirim */
 (function(){
-var GERI_EPOSTA="BURAYA-E-POSTA-YAZ";
+var GERI_EPOSTA="ikikalpbirdeste@gmail.com";
 var d=document;
 function el(i){return d.getElementById(i);}
 var RENK={sohbet:"#38bdf8",soru:"#fbbf24",itiraf:"#f43f5e",tahmin:"#a78bfa",hareket:"#fb923c",yaratici:"#34d399",meydan:"#facc15",yakin:"#f472b6",gunluk:"#94a3b8",sosyal:"#60a5fa",aile:"#f59e0b",hayat:"#2dd4bf",ask:"#fb7185",cilgin:"#c084fc",kendi:"#e879f9"};
