@@ -107,7 +107,6 @@ button.kucuk{padding:10px;font-size:.9rem}
 </div>
 <p id="gUyari" class="bilgi uyari"></p>
 <button onclick="gGonder()">📨 Gönder</button>
-<button class="ikincil" onclick="gKopyala()">📋 Metni kopyala</button>
 <button class="ikincil" onclick="goster('menu')">← Geri</button>
 </div>
 
@@ -529,14 +528,6 @@ return;
 }
 document.getElementById('gUyari').textContent="";
 location.href="mailto:"+GERI_EPOSTA+"?subject="+encodeURIComponent("İki Kalp Bir Deste geri bildirim")+"&body="+encodeURIComponent(g);
-}
-function gKopyala(){
-var g=gGovde();
-if(!g){return;}
-var u=document.getElementById('gUyari');
-if(navigator.clipboard&&navigator.clipboard.writeText){
-navigator.clipboard.writeText(g).then(function(){u.textContent="Kopyalandı. İstediğin yere yapıştırabilirsin.";}).catch(function(){u.textContent="Kopyalanamadı, metni elle seçip kopyala.";});
-}else{u.textContent="Kopyalanamadı, metni elle seçip kopyala.";}
 }
 
 modTurleriYukle();
