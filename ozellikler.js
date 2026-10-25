@@ -122,3 +122,23 @@ for(var j=deste.length-1;j>=0;j--){if(deste[j]===g){deste.splice(j,1);if(j<sira)
 kartCek(true,"Kart gizlendi. Geri açmak için Kartlarım › Gizlenen.");};
 ciz();
 })();
+
+/* Süre bitince ses ve titreşim */
+(function(){
+var b=document.getElementById("sureBtn"),ctx=null,et=null,uyarildi=false;
+if(!b)return;
+function hazirla(){try{var AC=window.AudioContext||window.webkitAudioContext;if(AC&&!ctx)ctx=new AC();if(ctx&&ctx.state==="suspended")ctx.resume();}catch(e){}}
+try{var l=document.createElement("label"),i=document.createElement("input");l.style.display="none";l.setAttribute("aria-hidden","true");i.type="checkbox";i.setAttribute("switch","");l.appendChild(i);document.body.appendChild(l);et=l;}catch(e){}
+function nota(f,t0,sure){if(!ctx)return;try{var o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+t0;o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.3,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+sure);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+sure+0.05);}catch(e){}}
+function bitti(){
+nota(880,0,0.15);nota(1175,0.2,0.3);
+try{if(navigator.vibrate){navigator.vibrate([200,100,200]);}else if(et){et.click();setTimeout(function(){et.click();},180);}}catch(e){}
+}
+b.addEventListener("click",hazirla);
+new MutationObserver(function(){
+var doldu=b.textContent.indexOf("Süre doldu")>=0;
+if(doldu&&!uyarildi){uyarildi=true;bitti();}
+else if(!doldu){uyarildi=false;}
+}).observe(b,{childList:true,characterData:true,subtree:true});
+})();
+
