@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">İki Kalp Bir Deste</string>
+    <string name="title_activity_main">İki Kalp Bir Deste</string>
+    <string name="package_name">pikserax.ikikalpbirdeste</string>
+    <string name="custom_url_scheme">pikserax.ikikalpbirdeste</string>
+</resources>
