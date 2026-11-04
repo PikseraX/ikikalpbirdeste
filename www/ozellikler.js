@@ -13,9 +13,10 @@ return t.replace(new RegExp("(^|[^"+TR+"])([Pp])artner([a-zçğıöşü]*)","g")
 if(!h.hasOwnProperty(s))return m;
 return pre+A+(h[s]?ekAl(A,h[s]):"");});}
 function sureBul(t){
-var m=t.match(/(\d+)\s*(saniye|dakika)/i);
-if(m){var v=+m[1];return m[2].toLowerCase()==="dakika"?v*60:v;}
-if(/\bbir\s+dakika/i.test(t))return 60;
+if(window.KART_SURELER&&window.KART_SURELER[t])return window.KART_SURELER[t];
+var m=t.match(/(\d+)\s*(saniye|saniyeler|dakika|dakikalar|seconds?|minutes?)/i);
+if(m){var v=+m[1],birim=m[2].toLowerCase();return /dakika|minute/.test(birim)?v*60:v;}
+if(/\bbir\s+dakika|\bone\s+minute\b/i.test(t))return 60;
 return 0;}
 /*END*/
 (function(){

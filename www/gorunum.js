@@ -185,8 +185,6 @@ el("oyun").appendChild(bar);
 
 /* Ana menü: büyük logo ve yüzen kalpler */
 dene(function(){
-var h=d.querySelector("#menu h1");
-if(h){h.innerHTML='<span class="logoK">💜</span><span class="logoY">İki Kalp<br>Bir Deste</span>';}
 var yz=d.createElement("div");yz.className="yuzenler";
 var E=["💜","💖","💕","✨","💗"];
 for(var i=0;i<10;i++){

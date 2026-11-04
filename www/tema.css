@@ -34,7 +34,10 @@ body #siraBilgi{display:none}
 #ilerleme{width:100%;max-width:340px;height:8px;border-radius:99px;background:var(--yuz);overflow:hidden}
 #ilerleme i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .35s ease}
 #altBar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--kenar);box-shadow:0 -8px 24px rgba(0,0,0,.35)}
-body #oyun{padding-bottom:calc(250px + env(safe-area-inset-bottom))}
+/* Kart ekranı sığmadığında başlık üstten kesilmesin; içerik aşağıya kaydırılsın. */
+body #oyun{justify-content:flex-start;padding-bottom:calc(250px + env(safe-area-inset-bottom))}
+body #oyun>:not(#altBar){flex-shrink:0}
+body #modAdi{width:100%;max-width:340px;line-height:1.25;overflow-wrap:anywhere}
 #altSatir{display:flex;gap:8px;width:100%;max-width:340px}
 body #altSatir button{flex:1;width:auto;max-width:none;padding:12px 6px;font-size:.92rem}
 body #menu{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 20%,var(--yuz),var(--bg) 70%)}

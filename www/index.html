@@ -17,8 +17,9 @@
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;min-height:100vh;background:#1a1025;color:#fff;font-family:-apple-system,Helvetica,Arial,sans-serif}
-.ekran{display:none;min-height:100vh;padding:24px;padding-top:max(24px,env(safe-area-inset-top));padding-bottom:max(24px,env(safe-area-inset-bottom));flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
-.ekran.aktif{display:flex}
+.ekran{display:none;height:calc(100vh - var(--banner-height,0px));min-height:calc(100vh - var(--banner-height,0px));padding:24px;padding-top:max(24px,env(safe-area-inset-top));padding-bottom:max(24px,env(safe-area-inset-bottom));flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.ekran.aktif{display:flex;overflow-y:auto}
+#menu.aktif{overflow-y:auto}
 h1{font-size:1.9rem;margin:0}
 h2{margin:0 0 8px}
 p{margin:0;opacity:.8}
@@ -52,7 +53,8 @@ button.kucuk{padding:10px;font-size:.9rem}
 <body>
 
 <div id="menu" class="ekran aktif">
-<h1>💜 İki Kalp Bir Deste</h1>
+<div class="logoK" aria-hidden="true">💜</div>
+<h1 class="logoY"><span id="oyunBaslik"><span id="oyunAdiSatir1">İki Kalp</span><br><span id="oyunAdiSatir2">Bir Deste</span></span></h1>
 <p>Kart çek, görevi yap, birlikte eğlen.</p>
 <button onclick="goster('oyuncular')">Oyuna Başla</button>
 <button class="ikincil" onclick="gbAc()">💬 Geri bildirim</button>
@@ -540,7 +542,20 @@ oyunculariYukle();
 oyunculariCiz();
 </script>
 <script src="ozellikler.js?v=1"></script>
-<script src="gorunum.js?v=1"></script>
+<script src="gorunum.js?v=2"></script>
+<script src="dil-kartlar-en.js?v=1"></script>
+<script src="dil-kartlar-de.js?v=1"></script>
+<script src="dil-kartlar-fr.js?v=1"></script>
+<script src="dil-kartlar-it.js?v=1"></script>
+<script src="dil-kartlar-es.js?v=1"></script>
+<script src="dil-kartlar-pt.js?v=1"></script>
+<script src="dil-kartlar-ru.js?v=1"></script>
+<script src="dil-kartlar-ja.js?v=1"></script>
+<script src="dil-kartlar-el.js?v=1"></script>
+<script src="dil-kartlar-zh-CN.js?v=1"></script>
+<script src="dil-kartlar-zh-TW.js?v=1"></script>
+<script src="dil.js?v=5"></script>
+<script src="satinalma.js?v=1"></script>
 <script>
 (function(){
   var C = window.Capacitor;
@@ -560,16 +575,93 @@ oyunculariCiz();
   var A = C.Plugins.AdMob;
   var TEST = true;
   var BANNER_ID = TEST ? 'ca-app-pub-3940256099942544/6300978111' : 'ca-app-pub-5635814061302700/9316614558';
+  var hazir = false, gosteriliyor = false;
+  function reklamsizMi(){ try{ return localStorage.getItem('kartOyunReklamsiz') === '1'; }catch(e){ return false; } }
   A.addListener('bannerAdSizeChanged', function(s){
-        var h = (s.height || 0) + 'px';
-    document.body.style.paddingBottom = h;
+    var h = Math.max(0, Number(s.height) || 0) + 'px';
+    document.documentElement.style.setProperty('--banner-height', h);
     var st = document.getElementById('reklamStil');
     if(!st){ st = document.createElement('style'); st.id = 'reklamStil'; document.head.appendChild(st); }
     st.textContent = '#altBar{bottom:' + h + ' !important}';
   });
-  A.initialize({}).then(function(){
-    return A.showBanner({ adId: BANNER_ID, adSize: 'ADAPTIVE_BANNER', position: 'BOTTOM_CENTER', margin: 0, isTesting: TEST });
-  }).catch(function(e){ console.log('AdMob hata', e); });
+  function bannerGoster(){
+    if(!hazir || gosteriliyor || reklamsizMi()){ return; }
+    gosteriliyor = true;
+    A.showBanner({ adId: BANNER_ID, adSize: 'ADAPTIVE_BANNER', position: 'BOTTOM_CENTER', margin: 0, isTesting: TEST }).catch(function(e){ gosteriliyor = false; console.log('AdMob hata', e); });
+  }
+  window.bannerYenidenGoster = bannerGoster;
+  window.bannerKaldir = function(){
+    gosteriliyor = false;
+    try{ var r = A.removeBanner(); if(r && r.catch){ r.catch(function(){}); } }catch(e){}
+    document.documentElement.style.setProperty('--banner-height', '0px');
+    var st = document.getElementById('reklamStil');
+    if(st){ st.textContent = ''; }
+  };
+  /* Tam ekran reklam: her 15 kartta bir (Yaptik, Pas Gec ve Gizle dahil), onunda kisa mola mesaji */
+  var ARALIK = 15, MIN_ARALIK_MS = 5 * 60 * 1000, MOLA_MS = 2000, DENEME_MAX = 5;
+  var INTERSTITIAL_ID = TEST ? 'ca-app-pub-3940256099942544/1033173712' : 'ca-app-pub-5635814061302700/8867612287';
+  var tHazir = false, tHazirlaniyor = false, tDeneme = 0;
+  function sayacOku(){ try{ return parseInt(localStorage.getItem('kartOyunReklamSayac'), 10) || 0; }catch(e){ return 0; } }
+  function sayacYaz(n){ try{ localStorage.setItem('kartOyunReklamSayac', String(n)); }catch(e){} }
+  function sonReklamZamaniOku(){ try{ return parseInt(localStorage.getItem('kartOyunSonGecisReklamZamani'), 10) || 0; }catch(e){ return 0; } }
+  function reklamAraligiDolduMu(){ return Date.now() - sonReklamZamaniOku() >= MIN_ARALIK_MS; }
+  function sonReklamZamaniYaz(){ try{ localStorage.setItem('kartOyunSonGecisReklamZamani', String(Date.now())); }catch(e){} }
+  function tHazirla(){
+    if(tHazirlaniyor || tHazir || reklamsizMi() || !hazir){ return; }
+    tHazirlaniyor = true;
+    var p;
+    try{ p = A.prepareInterstitial({ adId: INTERSTITIAL_ID, isTesting: TEST }); }catch(e){ tHazirlaniyor = false; return; }
+    Promise.resolve(p).then(function(){
+      tHazir = true; tHazirlaniyor = false; tDeneme = 0;
+    }).catch(function(e){
+      tHazir = false; tHazirlaniyor = false;
+      console.log('Tam ekran reklam hata', e);
+      if(tDeneme < DENEME_MAX){ tDeneme++; setTimeout(tHazirla, 60000); }
+    });
+  }
+  try{
+    var kl = A.addListener('interstitialAdDismissed', function(){ tHazir = false; setTimeout(tHazirla, 1000); });
+    if(kl && kl.catch){ kl.catch(function(){}); }
+  }catch(e){}
+  function molaEkrani(){
+    var o = document.createElement('div');
+    o.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--bg,#1a1025);color:#fff;text-align:center;padding:24px';
+    var ikon=document.createElement('div');ikon.style.fontSize='3.2rem';ikon.textContent='💜';
+    var baslik=document.createElement('div');baslik.style.cssText='font-size:1.6rem;font-weight:700';baslik.textContent=window.DIL?window.DIL.cevir('Kısa bir mola'):'Kısa bir mola';
+    var aciklama=document.createElement('div');aciklama.style.cssText='font-size:.95rem;opacity:.75';aciklama.textContent=window.DIL?window.DIL.cevir('Birazdan kaldığımız yerden devam ediyoruz'):'Birazdan kaldığımız yerden devam ediyoruz';
+    o.appendChild(ikon);o.appendChild(baslik);o.appendChild(aciklama);
+    document.body.appendChild(o);
+    return o;
+  }
+  function tGoster(){
+    var o = molaEkrani();
+    var bitir = function(){ if(o.parentNode){ o.parentNode.removeChild(o); } };
+    setTimeout(function(){
+      if(reklamsizMi() || !tHazir){ bitir(); return; }
+      tHazir = false;
+      var r;
+      try{ sonReklamZamaniYaz(); r = A.showInterstitial(); }catch(e){ bitir(); setTimeout(tHazirla, 1000); return; }
+      Promise.resolve(r).then(bitir, function(){ bitir(); setTimeout(tHazirla, 1000); });
+      setTimeout(bitir, 4000);
+      setTimeout(function(){ if(!tHazir && !tHazirlaniyor){ tHazirla(); } }, 60000);
+    }, MOLA_MS);
+  }
+  var kc0 = window.kartCek;
+  window.kartCek = function(pas, not){
+    var ilkMi = (typeof ilk !== 'undefined') ? ilk : false;
+    var r = kc0(pas, not);
+    try{
+      if(!ilkMi && !reklamsizMi()){
+        var n = sayacOku() + 1;
+        if(n >= ARALIK && tHazir && reklamAraligiDolduMu()){ sayacYaz(0); tGoster(); }
+        else{ sayacYaz(n); }
+      }
+    }catch(e){}
+    return r;
+  };
+  var bannerKaldir0 = window.bannerKaldir;
+  window.bannerYenidenGoster = function(){ bannerGoster(); tHazirla(); };
+  A.initialize({}).then(function(){ hazir = true; bannerGoster(); tHazirla(); }).catch(function(e){ console.log('AdMob hata', e); });
 })();
 </script>
 </body>

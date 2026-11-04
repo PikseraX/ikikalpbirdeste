@@ -2,7 +2,7 @@
   "name": "ikikalpbirdeste",
   "version": "1.0.0",
   "description": "",
-  "main": "gorunum.js",
+  "main": "www/gorunum.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +23,7 @@
     "@capacitor/android": "^8.6.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/cli": "^8.6.0",
-    "@capacitor/core": "^8.6.0"
+    "@capacitor/core": "^8.6.0",
+    "@capgo/native-purchases": "^8.9.6"
   }
 }
