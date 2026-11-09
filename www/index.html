@@ -169,7 +169,7 @@ function yeniOyuncu(){return {id:yeniId(),ad:"",cins:"",pcins:"hepsi",partner:"r
 var OYUNCULAR=[yeniOyuncu(),yeniOyuncu()];
 var PARTNER_SECLER=[];
 var MOD_TURLER={};
-var mod="",deste=[],sira=0,oyuncuIdx=0,sonKart="",ilk=true;
+var mod="",deste=[],sira=0,oyuncuIdx=0,sonKart="",ilk=true,oyunBitti=false;
 
 function modBul(ad){return MODLAR.filter(function(x){return x.ad===ad;})[0];}
 function modGorevleri(modAd){return GOREVLER[modAd]||[];}
@@ -464,7 +464,7 @@ if(deste.length>1&&deste[0]===sonKart){var t=deste[0];deste[0]=deste[1];deste[1]
 sira=0;
 }
 function oyunuBaslat(){
-oyuncuIdx=0;sonKart="";ilk=true;
+oyunBitti=false;oyuncuIdx=0;sonKart="";ilk=true;
 yeniDeste();
 if(deste.length===0){
 document.getElementById('uyari').textContent="Seçili türlerde görev yok. Bir tür aç.";
@@ -493,10 +493,19 @@ for(var j=0;j<OYUNCULAR.length;j++){if(j!==idx){ad.push(j);}}
 return ad[Math.floor(Math.random()*ad.length)];
 }
 function kartCek(pas){
+if(oyunBitti)return;
+if(sira>=deste.length){
+oyunBitti=true;
+document.getElementById('cekBtn').style.display="none";
+document.getElementById('pasBtn').style.display="none";
+var gizleBtn=document.getElementById('gizleBtn');if(gizleBtn)gizleBtn.style.display="none";
+var sureBtn=document.getElementById('sureBtn');if(sureBtn)sureBtn.style.display="none";
+setTimeout(function(){if(typeof window.oyunuBitir==="function")window.oyunuBitir();else goster('ozet');},0);
+return;
+}
 var n=OYUNCULAR.length,m=modBul(mod);
 if(!pas&&!ilk){oyuncuIdx=(oyuncuIdx+1)%n;}
 ilk=false;
-if(sira>=deste.length){yeniDeste();}
 var gorev=deste[sira];
 sira++;
 sonKart=gorev;

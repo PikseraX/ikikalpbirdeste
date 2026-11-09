@@ -103,10 +103,19 @@ tik();tId=setInterval(tik,250);};
 var ob=window.oyunuBaslat;
 window.oyunuBaslat=function(){ob();el("cekBtn").style.display="";gb.style.display="none";hazir(0);};
 window.kartCek=function(pas,not){
+if(oyunBitti)return;
+if(sira>=deste.length){
+oyunBitti=true;
+el("cekBtn").style.display="none";
+el("pasBtn").style.display="none";
+if(el("gizleBtn"))el("gizleBtn").style.display="none";
+if(el("sureBtn"))el("sureBtn").style.display="none";
+setTimeout(function(){if(typeof window.oyunuBitir==="function")window.oyunuBitir();else goster("ozet");},0);
+return;
+}
 var n=OYUNCULAR.length,m=modBul(mod),kart=el("kart");
 if(!pas&&!ilk){oyuncuIdx=(oyuncuIdx+1)%n;}
 ilk=false;
-if(sira>=deste.length){yeniDeste();}
 if(!deste.length){kart.textContent="Gösterilecek kart kalmadı. Gizlenen kartları geri açabilir ya da başka tür seçebilirsin.";el("cekBtn").style.display="none";el("pasBtn").style.display="none";gb.style.display="none";el("sayac").textContent="";hazir(0);return;}
 var g=deste[sira],gs=g;sira++;sonKart=g;
 if(m.kural){el("siraBilgi").textContent="Kartı okuyan: "+OYUNCULAR[oyuncuIdx].ad;}
@@ -186,6 +195,7 @@ if(en){var b=turBilgi(en);satir("🏆 En çok gelen tür",b.e+" "+b.ad+" ("+say+
 OYUNCULAR.forEach(function(o){satir("👤 "+o.ad,(oyTam[o.ad]||0)+" kart");});
 el("ozetNot").textContent=tam?"Güzel oyundu! Bir sonraki oyunda görüşürüz 💜":"Henüz hiç kart tamamlanmadı. “Yaptık” dediğin kartlar burada sayılır.";
 goster("ozet");}
+window.oyunuBitir=ozetAc;
 var bt=d.createElement("button");bt.className="ikincil kucuk";bt.textContent="🏁 Oyunu bitir";bt.onclick=ozetAc;
 el("gizleBtn").insertAdjacentElement("afterend",bt);
 el("ozTekrar").onclick=function(){oyunuBaslat();};

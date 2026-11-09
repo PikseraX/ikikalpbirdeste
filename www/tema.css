@@ -57,3 +57,7 @@ body .avbtn.sel{border-color:var(--acc);background:var(--yuz2)}
 .kalpyagmur{position:fixed;top:-40px;z-index:50;pointer-events:none;animation:yagmur linear forwards}
 @keyframes yagmur{to{transform:translateY(110vh) rotate(360deg);opacity:.8}}
 @media (prefers-reduced-motion:reduce){.yuzen,.kalpyagmur{display:none}}
+
+/* Mod seçimi: başlığı kamera/notch güvenli alanının altına al ve ekranı kaydırılabilir tut. */
+body #modlar.aktif{justify-content:flex-start;padding-top:max(64px,env(safe-area-inset-top))}
+body #modlar.aktif>*{flex-shrink:0}
