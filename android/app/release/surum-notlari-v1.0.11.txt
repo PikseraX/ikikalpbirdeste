@@ -1,0 +1,8 @@
+<tr-TR>
+• Satın alma onaylarında ve mağaza fiyatlarında bağlantı hatalarına karşı otomatik yeniden deneme eklendi.
+• Özel kartlarda çok dilli süre algılama ve partner isimleri düzeltildi.
+• Küçük ekran yerleşimi, temalar ve çeviriler iyileştirildi.
+• Kart çekme, pas, gizleme ve tekrar oynama sorunları giderildi.
+• Oyun sonunda geri tuşu ana menüye dönüyor.
+• Gizlenen kart tercihleri korundu; azaltılmış hareket desteği eklendi.
+</tr-TR>

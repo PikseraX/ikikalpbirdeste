@@ -12,7 +12,37 @@ try{if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Nati
 function oku(k){try{return localStorage.getItem(k)==="1";}catch(e){return false;}}
 function yaz(k,v){try{localStorage.setItem(k,v?"1":"0");}catch(e){}}
 var modAcik=oku("kartOyunModAcik"),reklamsiz=oku("kartOyunReklamsiz");
-var urunler={},geriHedef="menu";
+// Ads wait for the first successful ownership query, including after reinstall.
+window.SatinalmaDurumu={hazir:!P};
+var urunler={},geriHedef="menu",islemVar=false,kontrolHatasiGosteriliyor=false;
+var faturaKuyruk=Promise.resolve(),fiyatIslemi=null,durumIslemi=null;
+var fiyatBekliyor=false,fiyatTimer=0,fiyatDeneme=0;
+var durumTimer=0,durumDeneme=0,DURUM_GECIKMELERI=[5000,15000,30000,60000,120000];
+// Readiness keeps known rights intact; failed refreshes still need a bounded retry.
+var durumDogrulamaBekliyor=!!P;
+function durumuTekrarla(){
+if(!P||!durumDogrulamaBekliyor||durumTimer||islemVar||durumDeneme>=DURUM_GECIKMELERI.length)return;
+var gecikme=DURUM_GECIKMELERI[durumDeneme++];
+durumTimer=setTimeout(function(){
+durumTimer=0;
+if(islemVar){durumDeneme--;return;}
+durumKontrol().catch(function(){});
+},gecikme);
+}
+function baglantidaDurumKontrol(){
+clearTimeout(durumTimer);durumTimer=0;durumDeneme=0;
+durumKontrol().catch(function(){});
+if(fiyatBekliyor)fiyatlariYenile();
+}
+// NativePurchases shares a BillingClient: serialize all native operations.
+function sirala(fn){var task=faturaKuyruk.then(fn);faturaKuyruk=task.catch(function(){});return task;}
+function islemAyarla(v){
+islemVar=v;
+if(v){clearTimeout(durumTimer);durumTimer=0;durumDeneme=0;}
+magazaCiz();if(!v){durumuTekrarla();fiyatiTekrarla();}
+}
+var KONTROL_HATA="Satın alımlar kontrol edilemedi. İnternet bağlantını kontrol edip tekrar dene.";
+var BEKLEYEN_ODEME="Ödeme beklemede. Google Play'deki ödeme adımlarını tamamla. Onaylandıktan sonra satın alımlarını geri yükleyebilirsin.";
 
 /* Mod listesinde kilit işareti */
 function kilitIsaretle(){
@@ -33,14 +63,16 @@ window.modlariCiz=function(){mc0();try{kilitIsaretle();}catch(e){}};
 try{kilitIsaretle();}catch(e){}
 
 /* Kilitli moda dokununca satın alma ekranı açılır */
-var ts0=window.turSayfasiAc;
-window.turSayfasiAc=function(ad){
-if(KILITLI.indexOf(ad)>=0&&!modAcik){
+function modKilitli(ad){return KILITLI.indexOf(ad)>=0&&!modAcik;}
+function modaIzin(ad){
+if(!modKilitli(ad))return true;
 magazaAc("modlar","🔒 "+ad+" modu kilitli. Açmak için aşağıdan satın alabilirsin.");
-return;
+return false;
 }
-ts0(ad);
-};
+var ts0=window.turSayfasiAc;
+window.turSayfasiAc=function(ad){if(!modaIzin(ad))return false;return ts0(ad);};
+var ob0=window.oyunuBaslat;
+window.oyunuBaslat=function(){if(!modaIzin(mod))return false;return ob0();};
 
 /* Satın alma ekranı */
 var ek=d.createElement("div");ek.id="magaza";ek.className="ekran";
@@ -53,7 +85,7 @@ ek.innerHTML='<h2>🛒 Satın alımlar</h2>'
 +'<button id="btnKapat" class="ikincil">← Geri</button>';
 d.body.appendChild(ek);
 
-function mesaj(t){el("magazaMesaj").textContent=t;}
+function mesaj(t){kontrolHatasiGosteriliyor=t===KONTROL_HATA;el("magazaMesaj").textContent=t;}
 
 function dugme(b,sahip,u,id){
 b.onclick=function(){satinAl(id);};
@@ -62,31 +94,52 @@ b.style.opacity="";
 if(!P){b.textContent="Bu cihazda kullanılamıyor";b.disabled=true;return;}
 if(u===null){b.textContent="Şu an alınamıyor";b.disabled=true;return;}
 if(!u){b.textContent="Fiyat yükleniyor…";b.disabled=true;return;}
-b.textContent="Satın al · "+u.priceString;b.disabled=false;
+b.textContent="Satın al · "+u.priceString;b.disabled=islemVar;
 }
 function magazaCiz(){
 dugme(el("btnMod"),modAcik,urunler[URUN_MOD],URUN_MOD);
 dugme(el("btnReklam"),reklamsiz,urunler[URUN_REKLAM],URUN_REKLAM);
+el("btnGeriYukle").disabled=!P||islemVar;
+}
+function magazaGorunuyor(){return el("magaza").classList.contains("aktif");}
+function fiyatiTekrarla(){
+if(!P||!fiyatBekliyor||fiyatTimer||fiyatIslemi||islemVar||!magazaGorunuyor()||fiyatDeneme>=DURUM_GECIKMELERI.length)return;
+fiyatTimer=setTimeout(function(){
+fiyatTimer=0;
+if(islemVar||!magazaGorunuyor()){fiyatDeneme--;return;}
+fiyatYukle();
+},DURUM_GECIKMELERI[fiyatDeneme++]);
+}
+function fiyatlariYenile(){
+clearTimeout(fiyatTimer);fiyatTimer=0;fiyatDeneme=0;
+if(magazaGorunuyor())return fiyatYukle();
 }
 function fiyatYukle(){
 if(!P){magazaCiz();return;}
-P.getProducts({productIdentifiers:[URUN_MOD,URUN_REKLAM],productType:"inapp"}).then(function(r){
-var l=(r&&r.products)||[];
+if(islemVar){fiyatBekliyor=true;return fiyatIslemi;}
+if(fiyatIslemi)return fiyatIslemi;
+clearTimeout(fiyatTimer);fiyatTimer=0;
+fiyatIslemi=sirala(function(){return P.getProducts({productIdentifiers:[URUN_MOD,URUN_REKLAM],productType:"inapp"});}).then(function(r){
+if(!r||!Array.isArray(r.products))throw new Error("Invalid product response");
+var l=r.products;
 urunler[URUN_MOD]=null;urunler[URUN_REKLAM]=null;
 l.forEach(function(p){if(p&&(p.identifier===URUN_MOD||p.identifier===URUN_REKLAM)){urunler[p.identifier]=p;}});
+fiyatBekliyor=false;fiyatDeneme=0;
 magazaCiz();
 }).catch(function(){
+fiyatBekliyor=true;
 urunler[URUN_MOD]=null;urunler[URUN_REKLAM]=null;
 magazaCiz();
-});
+}).finally(function(){fiyatIslemi=null;fiyatiTekrarla();});
+return fiyatIslemi;
 }
 function magazaAc(hedef,not){
 geriHedef=hedef;
 el("magazaNot").textContent=not||"";
-mesaj("");
+if(!islemVar)mesaj("");
 magazaCiz();
-fiyatYukle();
 goster("magaza");
+fiyatlariYenile();
 }
 el("btnKapat").onclick=function(){goster(geriHedef);};
 
@@ -94,53 +147,74 @@ el("btnKapat").onclick=function(){goster(geriHedef);};
 function gecerli(p){
 return !!p&&(p.purchaseState==="PURCHASED"||p.purchaseState==="1");
 }
-function uygula(m,a){
+function uygula(m,a,onayBekliyor){
 modAcik=m;reklamsiz=a;
 yaz("kartOyunModAcik",m);yaz("kartOyunReklamsiz",a);
+window.SatinalmaDurumu.hazir=true;durumDogrulamaBekliyor=onayBekliyor;
+// A successful ownership query does not complete a failed acknowledgement.
+if(!onayBekliyor){clearTimeout(durumTimer);durumTimer=0;durumDeneme=0;}
+if(kontrolHatasiGosteriliyor)mesaj("");
+if(modKilitli(mod)){
+oyunBitti=true;
+var aktif=d.querySelector(".ekran.aktif");
+if(aktif&&["oyun","turEkran","ozet"].indexOf(aktif.id)>=0)goster("modlar");
+}
 try{if(window.modlariCiz){window.modlariCiz();}}catch(e){}
 try{
 if(a){if(window.bannerKaldir){window.bannerKaldir();}}
-else{if(window.bannerYenidenGoster){window.bannerYenidenGoster();}}
+if(window.bannerYenidenGoster){window.bannerYenidenGoster();}
 }catch(e){}
 try{magazaCiz();}catch(e){}
+if(onayBekliyor)durumuTekrarla();
 }
-function durumYenile(){
-if(!P){return Promise.resolve();}
-return P.getPurchases({productType:"inapp"}).then(function(r){
-var l=(r&&r.purchases)||[],m=false,a=false;
-l.forEach(function(p){
-if(!gecerli(p)){return;}
-if(p.productIdentifier===URUN_MOD){m=true;}
-if(p.productIdentifier===URUN_REKLAM){a=true;}
+async function durumYenile(){
+if(!P)return;
+var r;
+try{
+r=await P.getPurchases({productType:"inapp"});
+if(!r||!Array.isArray(r.purchases))throw new Error("Invalid purchase response");
+}catch(e){durumDogrulamaBekliyor=true;throw e;}
+var m=false,a=false,onayBekliyor=false;
+for(var p of r.purchases){
+if(!gecerli(p))continue;
+if(p.productIdentifier===URUN_MOD)m=true;
+if(p.productIdentifier===URUN_REKLAM)a=true;
 if(p.isAcknowledged===false&&p.purchaseToken){
-try{P.acknowledgePurchase({purchaseToken:p.purchaseToken}).catch(function(){});}catch(e){}
+try{await P.acknowledgePurchase({purchaseToken:p.purchaseToken});}catch(e){onayBekliyor=true;}
 }
-});
-uygula(m,a);
-}).catch(function(){});
 }
-
+uygula(m,a,onayBekliyor);
+}
+function durumKontrol(){
+if(islemVar)return Promise.resolve();
+clearTimeout(durumTimer);durumTimer=0;
+if(!durumIslemi)durumIslemi=sirala(durumYenile).catch(function(e){durumuTekrarla();throw e;}).finally(function(){durumIslemi=null;});
+return durumIslemi;
+}
 function satinAl(id){
 if(!P){mesaj("Satın alma bu cihazda kullanılamıyor.");return;}
-mesaj("Google Play açılıyor…");
-P.purchaseProduct({productIdentifier:id,productType:"inapp",quantity:1}).then(function(){
-return durumYenile();
-}).then(function(){
+if(islemVar||(id===URUN_MOD&&modAcik)||(id===URUN_REKLAM&&reklamsiz))return;
+islemAyarla(true);mesaj("Google Play açılıyor…");
+return sirala(async function(){
+await P.purchaseProduct({productIdentifier:id,productType:"inapp",quantity:1});
+try{await durumYenile();}catch(e){mesaj(KONTROL_HATA);return;}
 var ok=(id===URUN_MOD&&modAcik)||(id===URUN_REKLAM&&reklamsiz);
 mesaj(ok?"Teşekkürler! Satın alma tamamlandı 💜":"Satın alma işleniyor. Birkaç dakika sonra geri yükle düğmesine dokun.");
 }).catch(function(e){
-var t=String((e&&e.message)||e||"");
-mesaj(/cancel|iptal/i.test(t)?"Satın alma iptal edildi.":"Satın alma tamamlanamadı. Daha sonra tekrar dene.");
-});
+var t=String((e&&e.message)||e||""),kod=String((e&&e.code)||"");
+if(kod==="PURCHASE_PENDING"||/\bpending\b/i.test(t)){mesaj(BEKLEYEN_ODEME);}
+else{mesaj(kod==="USER_CANCELED"||/cancel|iptal/i.test(t)?"Satın alma iptal edildi.":"Satın alma tamamlanamadı. Daha sonra tekrar dene.");}
+}).finally(function(){islemAyarla(false);});
 }
 el("btnGeriYukle").onclick=function(){
 if(!P){mesaj("Bu cihazda kullanılamıyor.");return;}
-mesaj("Kontrol ediliyor…");
-P.restorePurchases().catch(function(){}).then(function(){
-return durumYenile();
-}).then(function(){
+if(islemVar)return;
+islemAyarla(true);mesaj("Kontrol ediliyor…");
+return sirala(async function(){
+await P.restorePurchases();
+await durumYenile();
 mesaj((modAcik||reklamsiz)?"Satın alımların geri yüklendi.":"Geri yüklenecek bir satın alma bulunamadı.");
-});
+}).catch(function(){mesaj(KONTROL_HATA);}).finally(function(){islemAyarla(false);if(fiyatBekliyor)fiyatlariYenile();});
 };
 
 /* Ana menüye Satın alımlar düğmesi */
@@ -154,9 +228,10 @@ if(gb){menu.insertBefore(mb,gb.nextSibling);}else{menu.appendChild(mb);}
 }catch(e){}
 
 /* Açılışta ve uygulamaya dönünce durumu yenile (iade olursa kilit geri gelir) */
-durumYenile();
+durumKontrol().catch(function(){});
+window.addEventListener("online",baglantidaDurumKontrol);
 try{
 var AP=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
-if(AP&&AP.addListener){AP.addListener("resume",function(){durumYenile();});}
+if(AP&&AP.addListener){AP.addListener("resume",baglantidaDurumKontrol);}
 }catch(e){}
 })();

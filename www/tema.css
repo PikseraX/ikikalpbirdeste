@@ -19,23 +19,25 @@ body #oyun.aktif{animation-name:ekranSolma}
 @keyframes ekranGiris{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes ekranSolma{from{opacity:0}to{opacity:1}}
 body .mod{border-left:6px solid var(--modrenk,var(--acc))}
-body .kart{position:relative;overflow:hidden;min-height:260px;padding:44px 26px;border-color:var(--acc);background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.10),transparent 55%),linear-gradient(145deg,var(--yuz),var(--yuz2));box-shadow:0 10px 30px rgba(0,0,0,.35)}
+body .kart{position:relative;overflow:hidden;overflow-wrap:anywhere;hyphens:auto;min-width:0;min-height:260px;padding:44px 26px;border-color:var(--acc);background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.10),transparent 55%),linear-gradient(145deg,var(--yuz),var(--yuz2));box-shadow:0 10px 30px rgba(0,0,0,.35)}
 body .kart.cevir{animation:kartAc .6s cubic-bezier(.2,.8,.2,1)}
 @keyframes kartAc{0%{transform:perspective(800px) rotateY(-100deg) scale(.9);opacity:0}60%{transform:perspective(800px) rotateY(8deg) scale(1.02);opacity:1}100%{transform:perspective(800px) rotateY(0) scale(1)}}
 body .kart::before{content:attr(data-ik);position:absolute;top:10px;left:14px;font-size:1.3rem;opacity:.85}
 body .kart::after{content:attr(data-ik);position:absolute;bottom:10px;right:14px;font-size:1.3rem;opacity:.85;transform:rotate(180deg)}
 body .kart.kapali{color:transparent;cursor:pointer;background:repeating-linear-gradient(45deg,var(--acc) 0 12px,var(--acc2) 12px 24px);border-color:rgba(255,255,255,.25)}
 body .kart.kapali::before{content:"💜";top:50%;left:50%;transform:translate(-50%,-62%);font-size:4.2rem;opacity:1}
-body .kart.kapali::after{content:"Çekmek için dokun";top:auto;bottom:22px;left:0;right:0;text-align:center;transform:none;font-size:.95rem;color:#fff;opacity:.95;font-weight:600}
+body .kart.kapali::after{content:attr(data-kapali-metin);top:auto;bottom:22px;left:0;right:0;text-align:center;transform:none;font-size:.95rem;color:#fff;opacity:.95;font-weight:600}
 body #siraBilgi{display:none}
 #sira2{display:none;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;width:100%;max-width:340px;padding:10px 12px;border-radius:16px;background:var(--yuz2);border:1px solid var(--kenar)}
-.kisi{display:flex;align-items:center;gap:6px;font-weight:700}
+.kisi{display:flex;align-items:center;gap:6px;font-weight:700;min-width:0;max-width:100%}
+.kisi>span:last-child,body .kitem>span{min-width:0;overflow-wrap:anywhere}
+.kisi .em{flex-shrink:0}
 .kisi .em{font-size:1.5rem}
 #ilerleme{width:100%;max-width:340px;height:8px;border-radius:99px;background:var(--yuz);overflow:hidden}
 #ilerleme i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .35s ease}
 #altBar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--kenar);box-shadow:0 -8px 24px rgba(0,0,0,.35)}
 /* Kart ekranı sığmadığında başlık üstten kesilmesin; içerik aşağıya kaydırılsın. */
-body #oyun{justify-content:flex-start;padding-bottom:calc(250px + env(safe-area-inset-bottom))}
+body #oyun{justify-content:flex-start;padding-bottom:calc(var(--alt-bar-height,250px) + 16px)}
 body #oyun>:not(#altBar){flex-shrink:0}
 body #modAdi{width:100%;max-width:340px;line-height:1.25;overflow-wrap:anywhere}
 #altSatir{display:flex;gap:8px;width:100%;max-width:340px}
@@ -46,7 +48,8 @@ body #menu>*:not(.yuzenler){position:relative;z-index:1}
 .yuzen{position:absolute;bottom:-50px;opacity:0;animation:yuksel linear infinite}
 @keyframes yuksel{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.5}90%{opacity:.3}100%{transform:translateY(-115vh) rotate(25deg);opacity:0}}
 .logoK{display:block;font-size:4rem;line-height:1.1;filter:drop-shadow(0 4px 14px rgba(236,72,153,.5))}
-.logoY{display:block;font-size:2.2rem;line-height:1.15;font-weight:800;background:linear-gradient(90deg,#f9a8d4,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.logoY{display:block;width:100%;max-width:340px;font-size:2.2rem;line-height:1.15;font-weight:800;background:linear-gradient(90deg,#f9a8d4,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+#oyunAdiSatir1,#oyunAdiSatir2{display:inline-block;white-space:nowrap}
 #temaSec{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:6px}
 #temaSec span{font-size:.9rem;opacity:.8}
 body #temaSec button{width:34px;height:34px;max-width:none;padding:0;border-radius:50%;border:3px solid transparent;box-shadow:none}
@@ -56,7 +59,12 @@ body .avbtn{width:40px;height:40px;flex:none;max-width:none;padding:0;font-size:
 body .avbtn.sel{border-color:var(--acc);background:var(--yuz2)}
 .kalpyagmur{position:fixed;top:-40px;z-index:50;pointer-events:none;animation:yagmur linear forwards}
 @keyframes yagmur{to{transform:translateY(110vh) rotate(360deg);opacity:.8}}
-@media (prefers-reduced-motion:reduce){.yuzen,.kalpyagmur{display:none}}
+@media (prefers-reduced-motion:reduce){
+.yuzen,.kalpyagmur{display:none}
+body .kart.cevir,body .ekran.aktif,body #oyun.aktif{animation:none}
+body button,#ilerleme i{transition:none}
+body button:active{transform:none}
+}
 
 /* Mod seçimi: başlığı kamera/notch güvenli alanının altına al ve ekranı kaydırılabilir tut. */
 body #modlar.aktif{justify-content:flex-start;padding-top:max(64px,env(safe-area-inset-top))}

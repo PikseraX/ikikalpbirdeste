@@ -5,7 +5,7 @@ ekle("Uzak Mesafe",[
 ["sohbet","Bugünkü gününü bir film özeti gibi anlat."],
 ["sohbet","Partnerine bulunduğun yerden gördüğün güzel bir şeyi anlat."],
 ["sohbet","Yan yana olsaydınız şu an birlikte ne yapardınız, anlat."],
-["soru","Partnerine sor: Seni en çok hangi anda özlüyorsun?"],
+["soru","Partnerine sor: Beni en çok hangi anda özlüyorsun?"],
 ["soru","Partnerine sor: Uzaktan birlikte yapabileceğimiz yeni bir aktivite ne olurdu?"],
 ["soru","Partnerine sor: Bugün hangi anda aklına geldim?"],
 ["soru","Partnerine sor: Ne zaman buluşabiliriz ve ilk ne yapalım?"],

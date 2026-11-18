@@ -45,22 +45,19 @@ ekle("Doğruluk mu Cesaretlik mi",[
 
 /* Seçim sistemi: oyuncu Doğruluk ya da Cesaret'i kendisi seçer, aynı seçeneği arka arkaya 3 kez seçemez */
 window.addEventListener("load",function(){
-var DCM="Doğruluk mu Cesaretlik mi",STREAK={},lastT="",d=document;
+var DCM="Doğruluk mu Cesaretlik mi",STREAK=Object.create(null),lastT="",d=document;
 function el(i){return d.getElementById(i);}
 function tipOf(t){var l=GOREVLER[DCM]||[];for(var i=0;i<l.length;i++){if(l[i][1]===t)return l[i][2]||"";}return "";}
-function var_(k){var l=GOREVLER[DCM]||[];for(var i=0;i<l.length;i++){if(l[i][2]===k&&MOD_TURLER[DCM][l[i][0]])return true;}return false;}
+function uygun(t,k){var tip=tipOf(t);return !tip||tip===k;}
+function var_(k){for(var i=sira;i<deste.length;i++){if(uygun(deste[i],k))return true;}return false;}
 function ikisiAcik(){return var_("dogruluk")&&var_("cesaret");}
 function secen(){var n=OYUNCULAR.length;return ilk?OYUNCULAR[oyuncuIdx]:OYUNCULAR[(oyuncuIdx+1)%n];}
 function engelli(ad,t){var s=STREAK[ad];return ikisiAcik()&&!!s&&s.t===t&&s.c>=2;}
 function ayarla(t){
-for(var tur=0;tur<2;tur++){
 for(var i=sira;i<deste.length;i++){
-if(tipOf(deste[i])===t){var x=deste[sira];deste[sira]=deste[i];deste[i]=x;return true;}
-}
-yeniDeste();
+if(uygun(deste[i],t)){var x=deste[sira];deste[sira]=deste[i];deste[i]=x;return true;}
 }
 return false;}
-function bos(){el("kart").textContent="Bu seçenekte gösterilecek kart kalmadı. Türleri değiştirebilir ya da gizlenen kartları geri açabilirsin.";}
 var kutu=d.createElement("div");kutu.id="dcSecim";
 kutu.style.cssText="display:none;flex-direction:column;gap:8px;width:100%;max-width:340px;align-items:center";
 var bilgi=d.createElement("div");bilgi.id="dcInfo";bilgi.className="bilgi";bilgi.style.whiteSpace="pre-line";
@@ -72,37 +69,46 @@ satir.appendChild(bD);satir.appendChild(bC);kutu.appendChild(bilgi);kutu.appendC
 el("cekBtn").insertAdjacentElement("afterend",kutu);
 function guncelle(){
 if(mod!==DCM)return;
+if(oyunBitti){kutu.style.display="none";return;}
+var son=sira>=deste.length;
 var ch=secen(),xD=engelli(ch.ad,"dogruluk"),xC=engelli(ch.ad,"cesaret");
-bD.style.display=var_("dogruluk")?"":"none";
-bC.style.display=var_("cesaret")?"":"none";
+bD.style.display=(son?lastT==="dogruluk":var_("dogruluk"))?"":"none";
+bC.style.display=(son?lastT==="cesaret":var_("cesaret"))?"":"none";
+bD.textContent=son?"✅ Yaptık, Sonraki Kart":"💬 Doğruluk";
+bC.textContent=son?"✅ Yaptık, Sonraki Kart":"🔥 Cesaret";
 bD.disabled=xD;bC.disabled=xC;bD.style.opacity=xD?".4":"";bC.style.opacity=xC?".4":"";
-var m=(ilk?"Sıra: ":"Sıradaki: ")+ch.ad+" — Doğruluk mu, Cesaret mi?";
+var m=son?"":(ilk?"Sıra: ":"Sıradaki: ")+ch.ad+" — Doğruluk mu, Cesaret mi?";
 if(xD)m+="\n"+ch.ad+" arka arkaya 2 kez Doğruluk seçti, bu sefer Cesaret.";
 if(xC)m+="\n"+ch.ad+" arka arkaya 2 kez Cesaret seçti, bu sefer Doğruluk.";
 bilgi.textContent=m;}
 var prev=window.kartCek;
 function sec(t){
-if(mod!==DCM)return;
+if(mod!==DCM||oyunBitti)return;
+if(sira>=deste.length){prev(false);guncelle();return;}
 var ch=secen();
 if(engelli(ch.ad,t)){guncelle();return;}
-if(!ayarla(t)){bos();return;}
+if(!ayarla(t)){guncelle();return;}
+if(prev(false)===false)return;
 lastT=t;
 var s=STREAK[ch.ad];
 STREAK[ch.ad]=(s&&s.t===t)?{t:t,c:s.c+1}:{t:t,c:1};
-prev(false);
 guncelle();}
 bD.onclick=function(){sec("dogruluk");};
 bC.onclick=function(){sec("cesaret");};
 window.kartCek=function(pas,not){
 if(mod!==DCM){return prev(pas,not);}
-if(!pas||!lastT){return;}
-if(!ayarla(lastT)){bos();return;}
-prev(pas,not);};
+if(oyunBitti||!pas||!lastT){return false;}
+var secimBekle=sira<deste.length&&!ayarla(lastT);
+var sonuc=prev(pas,not,secimBekle);
+if(sonuc===false)return false;
+if(secimBekle)lastT="";
+else if(!oyunBitti)lastT=tipOf(sonKart)||lastT;
+guncelle();return sonuc;};
 var ob=window.oyunuBaslat;
 window.oyunuBaslat=function(){
-ob();
+if(ob()===false)return false;
 if(mod===DCM){
-STREAK={};lastT="";
+STREAK=Object.create(null);lastT="";
 el("cekBtn").style.display="none";kutu.style.display="flex";
 el("kart").textContent="Doğruluk mu, Cesaret mi? 👇";
 var k=el("kuralBilgi");k.textContent="Sıradaki oyuncu kendisi seçer. Aynı seçeneği arka arkaya 3 kez seçemezsin.";k.style.display="block";
