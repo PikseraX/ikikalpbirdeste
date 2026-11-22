@@ -688,6 +688,9 @@ function sureBul(t) {
     sBtn.addEventListener("click", function () {
       sesAcik = !sesAcik;
       try { localStorage.setItem("ik_ses_v1", sesAcik ? "1" : "0"); } catch (e) {}
+      if (!sesAcik && ctx && ctx.state === "running") {
+        try { ctx.suspend().catch(function () {}); } catch (e) {}
+      }
       guncelle();
     });
     tBtn.addEventListener("click", function () {
@@ -708,11 +711,14 @@ function sureBul(t) {
     try {
       var AC = window.AudioContext || window.webkitAudioContext;
       if (AC && !ctx) ctx = new AC();
-      if (ctx && ctx.state === "suspended") ctx.resume();
+      if (ctx && ctx.state !== "running" && ctx.state !== "closed") {
+        var rp = ctx.resume();
+        if (rp && rp.catch) rp.catch(function () {});
+      }
     } catch (e) {}
   }
   function nota(f, t0, sure) {
-    if (!ctx || !sesAcik) return;
+    if (!ctx || !sesAcik || document.hidden || ctx.state !== "running") return;
     try {
       var o = ctx.createOscillator(),
         g = ctx.createGain(),
@@ -729,6 +735,7 @@ function sureBul(t) {
     } catch (e) {}
   }
   function bitti() {
+    if (document.hidden) return;
     if (sesAcik) {
       nota(880, 0, 0.15);
       nota(1175, 0.2, 0.3);
@@ -741,6 +748,18 @@ function sureBul(t) {
       } catch (e) {}
     }
   }
+  document.addEventListener("visibilitychange", function () {
+    if (!ctx || ctx.state === "closed") return;
+    try {
+      if (document.hidden && ctx.state === "running") {
+        var sp = ctx.suspend();
+        if (sp && sp.catch) sp.catch(function () {});
+      } else if (!document.hidden && sesAcik && ctx.state !== "running") {
+        var rp = ctx.resume();
+        if (rp && rp.catch) rp.catch(function () {});
+      }
+    } catch (e) {}
+  });
   b.addEventListener("click", hazirla);
   // Watch the state class, not the visible text, so every interface language triggers once.
   new MutationObserver(function () {

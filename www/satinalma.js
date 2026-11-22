@@ -513,7 +513,8 @@
   try {
     var AP = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
     if (AP && AP.addListener) {
-      AP.addListener("resume", baglantidaDurumKontrol);
+      var resumeDinle = AP.addListener("resume", baglantidaDurumKontrol);
+      if (resumeDinle && resumeDinle.catch) resumeDinle.catch(function () {});
     }
     if (iosMagazasi && P && P.addListener) {
       P.addListener("transactionUpdated", baglantidaDurumKontrol).catch(function () {});

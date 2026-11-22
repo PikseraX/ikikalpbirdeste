@@ -161,19 +161,22 @@
       return false;
     }
   }
-  A.addListener("bannerAdSizeChanged", function (s) {
-    // Late native size events must not reserve space after ads were removed or refused.
-    if (reklamsizMi() || gizlilikAcik || (izinHazir && !izinli)) return;
-    var h = Math.max(0, Number(s && s.height) || 0) + "px";
-    document.documentElement.style.setProperty("--banner-height", h);
-    var st = document.getElementById("reklamStil");
-    if (!st) {
-      st = document.createElement("style");
-      st.id = "reklamStil";
-      document.head.appendChild(st);
-    }
-    st.textContent = "#altBar{bottom:" + h + " !important}";
-  });
+  try {
+    var bannerSizeDinle = A.addListener("bannerAdSizeChanged", function (s) {
+      // Late native size events must not reserve space after ads were removed or refused.
+      if (reklamsizMi() || gizlilikAcik || (izinHazir && !izinli)) return;
+      var h = Math.max(0, Number(s && s.height) || 0) + "px";
+      document.documentElement.style.setProperty("--banner-height", h);
+      var st = document.getElementById("reklamStil");
+      if (!st) {
+        st = document.createElement("style");
+        st.id = "reklamStil";
+        document.head.appendChild(st);
+      }
+      st.textContent = "#altBar{bottom:" + h + " !important}";
+    });
+    if (bannerSizeDinle && bannerSizeDinle.catch) bannerSizeDinle.catch(function () {});
+  } catch (e) {}
   function bannerGoster() {
     if (!hazir || gosteriliyor || !reklamIzinli()) {
       return;
