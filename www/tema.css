@@ -23,6 +23,31 @@ body[data-tema="pembe"] {
   --acc: #ec4899;
   --acc2: #f59e0b;
 }
+body[data-tema="neon"] {
+  --bg: #090617;
+  --yuz: #1b1236;
+  --yuz2: #100b26;
+  --kenar: rgba(0, 240, 255, 0.4);
+  --acc: #ff2a85;
+  --acc2: #00f0ff;
+}
+body[data-tema="akdeniz"] {
+  --bg: #fdf6ec;
+  --yuz: #fffdf9;
+  --yuz2: #f6e7d4;
+  --kenar: rgba(200, 75, 49, 0.28);
+  --acc: #c84b31;
+  --acc2: #e08e45;
+  color: #2b1812;
+}
+body[data-tema="kutup"] {
+  --bg: #061826;
+  --yuz: rgba(255, 255, 255, 0.11);
+  --yuz2: rgba(12, 38, 56, 0.8);
+  --kenar: rgba(110, 231, 183, 0.4);
+  --acc: #10b981;
+  --acc2: #818cf8;
+}
 body {
   background: var(--bg);
   font-family:
@@ -345,9 +370,11 @@ body #menu > *:not(.yuzenler) {
 }
 #temaSec {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+  max-width: 340px;
   margin-top: 6px;
 }
 #temaSec span {
@@ -424,4 +451,201 @@ body .avbtn.sel {
 body #modlar.aktif {
   justify-content: flex-start;
   padding-top: max(64px, env(safe-area-inset-top));
+}
+
+/* ================= CESUR TEMA STİLLERİ: NEON · AKDENİZ · KUTUP ================= */
+
+/* 1. Neon Tokyo Gece */
+body[data-tema="neon"] {
+  background-color: #090617;
+  background-image:
+    radial-gradient(circle at 82% 8%, rgba(255, 42, 133, 0.26), transparent 44%),
+    radial-gradient(circle at 14% 88%, rgba(0, 240, 255, 0.2), transparent 46%),
+    linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 42, 133, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 26px 26px, 26px 26px;
+}
+body[data-tema="neon"] #menu {
+  background:
+    radial-gradient(circle at 80% 14%, rgba(255, 42, 133, 0.24), transparent 48%),
+    radial-gradient(circle at 18% 82%, rgba(0, 240, 255, 0.18), transparent 50%),
+    transparent;
+}
+body[data-tema="neon"] .logoY {
+  background: linear-gradient(90deg, #ff5db1, #c084fc, #00f0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+body[data-tema="neon"] .logoK {
+  filter: drop-shadow(0 0 18px rgba(255, 42, 133, 0.85));
+}
+body[data-tema="neon"] .kart {
+  background: linear-gradient(155deg, rgba(28, 18, 56, 0.82), rgba(11, 10, 28, 0.94));
+  border-color: rgba(0, 240, 255, 0.58);
+  box-shadow:
+    0 20px 44px rgba(0, 0, 0, 0.72),
+    0 0 26px rgba(255, 42, 133, 0.28),
+    inset 0 0 18px rgba(0, 240, 255, 0.12);
+  backdrop-filter: blur(16px);
+}
+body[data-tema="neon"] button.ikincil,
+body[data-tema="neon"] .tur,
+body[data-tema="neon"] .sek,
+body[data-tema="neon"] #sira2,
+body[data-tema="neon"] .oyuncu {
+  background: rgba(18, 13, 42, 0.78);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+body[data-tema="neon"] #altBar {
+  background: rgba(9, 6, 23, 0.92);
+  border-top-color: rgba(0, 240, 255, 0.35);
+  box-shadow: 0 -8px 28px rgba(255, 42, 133, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+/* 2. Akdeniz Günbatımı (Cesur Aydınlık) */
+body[data-tema="akdeniz"] {
+  background-color: #fdf6ec;
+  background-image: linear-gradient(175deg, #fdf6ec 0%, #f7e6d4 52%, #f1d4be 100%);
+  color: #2b1812;
+}
+body[data-tema="akdeniz"] #menu {
+  background:
+    radial-gradient(circle at 82% 14%, rgba(235, 134, 75, 0.28), transparent 52%),
+    radial-gradient(circle at 18% 84%, rgba(200, 75, 49, 0.16), transparent 52%),
+    transparent;
+}
+body[data-tema="akdeniz"] .logoY {
+  font-family: Georgia, "Palatino Linotype", serif;
+  background: linear-gradient(90deg, #a6341f, #d97736);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+body[data-tema="akdeniz"] .logoK {
+  filter: drop-shadow(0 6px 14px rgba(200, 75, 49, 0.35));
+}
+body[data-tema="akdeniz"] h1,
+body[data-tema="akdeniz"] h2,
+body[data-tema="akdeniz"] p,
+body[data-tema="akdeniz"] .bilgi,
+body[data-tema="akdeniz"] .kisi,
+body[data-tema="akdeniz"] #temaSec span {
+  color: #2b1812;
+}
+body[data-tema="akdeniz"] .uyari {
+  color: #b45309;
+}
+body[data-tema="akdeniz"] .kart {
+  font-family: Georgia, "Palatino Linotype", serif;
+  color: #25130d;
+  background: linear-gradient(165deg, #fffdf9, #fbf0e2);
+  border-color: rgba(200, 75, 49, 0.38);
+  box-shadow:
+    0 20px 40px rgba(138, 62, 34, 0.18),
+    inset 0 2px 0 rgba(255, 255, 255, 0.92);
+}
+body[data-tema="akdeniz"] .kart.kapali {
+  color: transparent;
+}
+body[data-tema="akdeniz"] button.ikincil,
+body[data-tema="akdeniz"] .tur,
+body[data-tema="akdeniz"] .sek,
+body[data-tema="akdeniz"] .sil,
+body[data-tema="akdeniz"] .kitem button,
+body[data-tema="akdeniz"] .avbtn {
+  background: rgba(255, 253, 249, 0.88);
+  color: #3a1f16;
+  border: 1px solid rgba(168, 72, 42, 0.22);
+}
+body[data-tema="akdeniz"] .tur.acik,
+body[data-tema="akdeniz"] .sek.acik {
+  background: linear-gradient(135deg, #c84b31, #e08e45);
+  color: #fffaf3;
+  border-color: transparent;
+}
+body[data-tema="akdeniz"] .oyuncu,
+body[data-tema="akdeniz"] .kitem,
+body[data-tema="akdeniz"] #sira2 {
+  background: rgba(255, 251, 245, 0.85);
+  border-color: rgba(168, 72, 42, 0.24);
+  color: #2b1812;
+}
+body[data-tema="akdeniz"] .oyuncu input,
+body[data-tema="akdeniz"] .oyuncu select,
+body[data-tema="akdeniz"] .oyuncu textarea,
+body[data-tema="akdeniz"] #kendiInp {
+  background: #ffffff;
+  border-color: rgba(168, 72, 42, 0.28);
+  color: #2b1812;
+}
+body[data-tema="akdeniz"] .oyuncu input::placeholder,
+body[data-tema="akdeniz"] .oyuncu textarea::placeholder,
+body[data-tema="akdeniz"] #kendiInp::placeholder {
+  color: #9c7a69;
+}
+body[data-tema="akdeniz"] #ilerleme {
+  background: rgba(168, 72, 42, 0.16);
+}
+body[data-tema="akdeniz"] #altBar {
+  background: rgba(253, 246, 236, 0.95);
+  border-top-color: rgba(168, 72, 42, 0.22);
+  box-shadow: 0 -8px 24px rgba(138, 62, 34, 0.12);
+}
+body[data-tema="akdeniz"] #temaSec button.sel {
+  border-color: #c84b31;
+}
+
+/* 3. Kutup Işıkları (Aurora Glass) */
+body[data-tema="kutup"] {
+  background-color: #061826;
+  background-image:
+    radial-gradient(circle at 82% 10%, rgba(52, 211, 153, 0.26), transparent 48%),
+    radial-gradient(circle at 16% 88%, rgba(129, 140, 248, 0.28), transparent 50%),
+    linear-gradient(160deg, #061826 0%, #0c2638 45%, #1a173d 100%);
+  color: #eefbf7;
+}
+body[data-tema="kutup"] #menu {
+  background:
+    radial-gradient(circle at 82% 14%, rgba(52, 211, 153, 0.25), transparent 50%),
+    radial-gradient(circle at 18% 82%, rgba(129, 140, 248, 0.26), transparent 52%),
+    transparent;
+}
+body[data-tema="kutup"] .logoY {
+  background: linear-gradient(90deg, #6ee7b7, #7dd3fc, #a5b4fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+body[data-tema="kutup"] .logoK {
+  filter: drop-shadow(0 0 18px rgba(52, 211, 153, 0.65));
+}
+body[data-tema="kutup"] .kart {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+  border-color: rgba(110, 231, 183, 0.45);
+  box-shadow:
+    0 22px 46px rgba(2, 10, 22, 0.56),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(18px);
+}
+body[data-tema="kutup"] button.ikincil,
+body[data-tema="kutup"] .tur,
+body[data-tema="kutup"] .sek,
+body[data-tema="kutup"] #sira2,
+body[data-tema="kutup"] .oyuncu,
+body[data-tema="kutup"] .kitem {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(110, 231, 183, 0.25);
+  backdrop-filter: blur(12px);
+}
+body[data-tema="kutup"] .oyuncu input,
+body[data-tema="kutup"] .oyuncu select,
+body[data-tema="kutup"] .oyuncu textarea,
+body[data-tema="kutup"] #kendiInp {
+  background: rgba(6, 24, 38, 0.72);
+  border-color: rgba(110, 231, 183, 0.3);
+}
+body[data-tema="kutup"] #altBar {
+  background: rgba(6, 24, 38, 0.9);
+  border-top-color: rgba(110, 231, 183, 0.28);
+  backdrop-filter: blur(14px);
 }

@@ -37,7 +37,10 @@
   var TEMALAR = [
     { k: "mor", r: "#7c3aed", bg: "#1a1025" },
     { k: "gece", r: "#3b82f6", bg: "#0b1220" },
-    { k: "pembe", r: "#ec4899", bg: "#2a1020" }
+    { k: "pembe", r: "#ec4899", bg: "#2a1020" },
+    { k: "neon", r: "linear-gradient(135deg,#ff2a85,#00f0ff)", bg: "#090617" },
+    { k: "akdeniz", r: "linear-gradient(135deg,#e07a3f,#fdf6ec)", bg: "#fdf6ec" },
+    { k: "kutup", r: "linear-gradient(135deg,#10b981,#818cf8)", bg: "#061826" }
   ];
   var DEF = ["🦊", "🐻", "🐼", "🐯", "🦄", "🐸", "🐙", "🦋"],
     ALL = ["🦊", "🐻", "🐼", "🐯", "🦄", "🐸", "🐙", "🦋", "🐰", "🌸", "⭐", "🍀"];
