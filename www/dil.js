@@ -1899,6 +1899,19 @@
       "🌐 Dil": "🌐 语言"
     }
   };
+  (function () {
+    var ek = {
+      "🔊 Ses: Açık": ["🔊 Sound: On", "🔊 Ton: Ein", "🔊 Son : Oui", "🔊 Audio: On", "🔊 Sonido: Sí", "🔊 Som: Lig.", "🔊 Звук: Вкл", "🔊 音: オン", "🔊 Ήχος: Ναι", "🔊 音效：开", "🔊 音效：開"],
+      "🔇 Ses: Kapalı": ["🔇 Sound: Off", "🔇 Ton: Aus", "🔇 Son : Non", "🔇 Audio: Off", "🔇 Sonido: No", "🔇 Som: Desl.", "🔇 Звук: Выкл", "🔇 音: オフ", "🔇 Ήχος: Όχι", "🔇 音效：关", "🔇 音效：關"],
+      "📳 Titreşim: Açık": ["📳 Haptics: On", "📳 Vibration: Ein", "📳 Vibrations : Oui", "📳 Vibrazione: On", "📳 Vibración: Sí", "📳 Vibração: Lig.", "📳 Вибро: Вкл", "📳 振動: オン", "📳 Δόνηση: Ναι", "📳 震动：开", "📳 震動：開"],
+      "📴 Titreşim: Kapalı": ["📴 Haptics: Off", "📴 Vibration: Aus", "📴 Vibrations : Non", "📴 Vibrazione: Off", "📴 Vibración: No", "📴 Vibração: Desl.", "📴 Вибро: Выкл", "📴 振動: オフ", "📴 Δόνηση: Όχι", "📴 震动：关", "📴 震動：關"]
+    };
+    var kodlar = ["en", "de", "fr", "it", "es", "pt", "ru", "ja", "el", "zh-CN", "zh-TW"];
+    kodlar.forEach(function (k, i) {
+      if (!UI[k]) return;
+      Object.keys(ek).forEach(function (tr) { UI[k][tr] = ek[tr][i]; });
+    });
+  })();
   var molaMetinleri = {
     en: ["A short break", "We’ll continue in a moment"],
     de: ["Kurze Pause", "Gleich geht es weiter"],

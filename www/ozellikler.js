@@ -656,13 +656,55 @@ function sureBul(t) {
   else gizlileriHazirla();
 })();
 
-/* Süre bitince ses ve titreşim */
+/* Süre bitince ses ve titreşim (+ aç/kapa ayarı) */
 (function () {
   var b = document.getElementById("sureBtn"),
     ctx = null,
     uyarildi = false;
+  var sesAcik = true,
+    titresimAcik = true;
+  try {
+    if (localStorage.getItem("ik_ses_v1") === "0") sesAcik = false;
+    if (localStorage.getItem("ik_titresim_v1") === "0") titresimAcik = false;
+  } catch (e) {}
+  var menu = document.getElementById("menu");
+  if (menu) {
+    var satir = document.createElement("div");
+    satir.style.cssText = "display:flex;gap:8px;width:100%;max-width:320px;margin:4px auto;";
+    var sBtn = document.createElement("button");
+    sBtn.id = "ikSesBtn";
+    sBtn.type = "button";
+    sBtn.className = "ikincil kucuk";
+    sBtn.style.cssText = "flex:1;margin:0;";
+    var tBtn = document.createElement("button");
+    tBtn.id = "ikTitresimBtn";
+    tBtn.type = "button";
+    tBtn.className = "ikincil kucuk";
+    tBtn.style.cssText = "flex:1;margin:0;";
+    function guncelle() {
+      sBtn.textContent = sesAcik ? "🔊 Ses: Açık" : "🔇 Ses: Kapalı";
+      tBtn.textContent = titresimAcik ? "📳 Titreşim: Açık" : "📴 Titreşim: Kapalı";
+    }
+    sBtn.addEventListener("click", function () {
+      sesAcik = !sesAcik;
+      try { localStorage.setItem("ik_ses_v1", sesAcik ? "1" : "0"); } catch (e) {}
+      guncelle();
+    });
+    tBtn.addEventListener("click", function () {
+      titresimAcik = !titresimAcik;
+      try { localStorage.setItem("ik_titresim_v1", titresimAcik ? "1" : "0"); } catch (e) {}
+      guncelle();
+    });
+    guncelle();
+    satir.appendChild(sBtn);
+    satir.appendChild(tBtn);
+    var gizBtn = document.getElementById("gizlilikPolitikasi");
+    if (gizBtn && gizBtn.parentNode === menu) menu.insertBefore(satir, gizBtn);
+    else menu.appendChild(satir);
+  }
   if (!b) return;
   function hazirla() {
+    if (!sesAcik) return;
     try {
       var AC = window.AudioContext || window.webkitAudioContext;
       if (AC && !ctx) ctx = new AC();
@@ -670,7 +712,7 @@ function sureBul(t) {
     } catch (e) {}
   }
   function nota(f, t0, sure) {
-    if (!ctx) return;
+    if (!ctx || !sesAcik) return;
     try {
       var o = ctx.createOscillator(),
         g = ctx.createGain(),
@@ -687,13 +729,17 @@ function sureBul(t) {
     } catch (e) {}
   }
   function bitti() {
-    nota(880, 0, 0.15);
-    nota(1175, 0.2, 0.3);
-    try {
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]);
-      }
-    } catch (e) {}
+    if (sesAcik) {
+      nota(880, 0, 0.15);
+      nota(1175, 0.2, 0.3);
+    }
+    if (titresimAcik) {
+      try {
+        if (navigator.vibrate) {
+          navigator.vibrate([200, 100, 200]);
+        }
+      } catch (e) {}
+    }
   }
   b.addEventListener("click", hazirla);
   // Watch the state class, not the visible text, so every interface language triggers once.
