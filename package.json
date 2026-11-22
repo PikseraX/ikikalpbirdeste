@@ -4,7 +4,8 @@
   "description": "",
   "main": "www/gorunum.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "eas-build-post-install": "bash scripts/eas-native-setup.sh",
+    "test": "node tests/regression.cjs && node tests/audit-regression.cjs && node tests/four-fixes.cjs && node tests/november-fixes.cjs && node tests/purchase-summary-fixes.cjs && node tests/review-fixes-nov18.cjs && node tests/purchase-offers.cjs"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
     "@capacitor/app": "^8.1.2",
     "@capacitor/cli": "^8.6.0",
     "@capacitor/core": "^8.6.0",
+    "@capacitor/ios": "8.6.0",
     "@capgo/native-purchases": "^8.9.6"
   }
 }

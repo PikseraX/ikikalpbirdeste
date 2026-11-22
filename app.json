@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "İki Kalp Bir Deste",
+    "slug": "iki-kalp-bir-deste",
+    "android": {
+      "package": "pikserax.ikikalpbirdeste"
+    },
+    "ios": {
+      "bundleIdentifier": "pikserax.ikikalpbirdeste",
+      "supportsTablet": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0562b794-5d81-441e-8a95-ea3370563d9e"
+      }
+    }
+  }
+}

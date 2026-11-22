@@ -1,5 +1,8 @@
 {
   "appId": "pikserax.ikikalpbirdeste",
   "appName": "Iki Kalp Bir Deste",
-  "webDir": "www"
+  "webDir": "www",
+  "ios": {
+    "includePlugins": ["@capacitor/app", "@capgo/native-purchases"]
+  }
 }

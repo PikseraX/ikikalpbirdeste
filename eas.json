@@ -1,0 +1,33 @@
+{
+  "cli": {
+    "appVersionSource": "local",
+    "requireCommit": false
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "gradleCommand": ":app:assembleDebug",
+        "withoutCredentials": true
+      },
+      "env": {
+        "EAS_BUILD_DISABLE_BUNDLE_JAVASCRIPT_STEP": "1"
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "android": {
+        "credentialsSource": "local",
+        "buildType": "app-bundle"
+      },
+      "ios": {
+        "credentialsSource": "remote",
+        "image": "latest",
+        "scheme": "App"
+      },
+      "env": {
+        "EAS_BUILD_DISABLE_BUNDLE_JAVASCRIPT_STEP": "1"
+      }
+    }
+  }
+}

@@ -151,7 +151,7 @@ w.KART_CEVIRILER.de={
     "Erzähl, was ihr gern zusammen machen würdet, wenn ihr älter seid.","Erzähl, wie du deinen Tag im Alter verbringen möchtest.",
     "Plant eine kleine Reise in ein Land, das ihr gemeinsam besuchen möchtet.",
     "Nenne drei Dinge, die du im nächsten Jahr gern gemeinsam machen möchtest.",
-    "Frag dein Gegenüber: Wie stellst du uns in zehn Jahren vor?","Frag dein Gegenüber: Wie sieht dein Traumhaus aus?",
+    "Frag dein Gegenüber: Wie stellst du dir uns in zehn Jahren vor?","Frag dein Gegenüber: Wie sieht dein Traumhaus aus?",
     "Frag dein Gegenüber: Was Neues würdest du gern mit mir lernen?","Frag dein Gegenüber: Welche Routine könnten wir gemeinsam anfangen?",
     "Frag dein Gegenüber: Wo siehst du uns in 20 Jahren?","Frag dein Gegenüber: Was ist dein größter Traum für unser gemeinsames Leben?",
     "Frag dein Gegenüber: Welches Projekt könnten wir gemeinsam starten?","Zeichnet gemeinsam euer Traumhaus.",

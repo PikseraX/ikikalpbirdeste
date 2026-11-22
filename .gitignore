@@ -9,3 +9,13 @@ android/captures/
 *.jks
 *.aab
 *.apk
+
+# Local IDE, Gradle and signing files
+.idea/
+.gradle/
+.kotlin/
+/signing-key-info.txt
+/Anahtar/
+/credentials.json
+/reklam/
+*.mp4

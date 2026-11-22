@@ -54,16 +54,16 @@ w.KART_CEVIRILER.es={
     "Pregúntale: Si ganaras la lotería, ¿qué comprarías primero?",
     "Confiesa tu costumbre secreta más extraña.",
     "Confiesa una combinación rara de comida que te encanta y nunca le has contado a nadie.",
-    "Confiesa algo que hacías de niño y que todavía te hace reír."
+    "Confiesa algo que hacías en la infancia y que todavía te hace reír."
   ],
   "Beni Ne Kadar Tanıyorsun":[
     "Adivina la comida favorita de tu pareja y luego pregúntale si acertaste.",
     "Adivina su color, canción y película favoritos. ¿Cuántos acertaste?",
-    "Adivina qué profesión soñaba tener tu pareja cuando era niño.","Adivina cuál es su mayor miedo.",
+    "Adivina qué profesión soñaba tener tu pareja durante su infancia.","Adivina cuál es su mayor miedo.",
     "Adivina qué haría tu pareja si pudiera hacer cualquier cosa durante un día.","Adivina cuál es su destino de vacaciones favorito.",
     "Adivina el estado de ánimo de tu pareja hoy con una palabra.","Adivina cuál es su estación favorita y por qué.",
     "Adivina qué cantante escucha más tu pareja en su teléfono.","Adivina qué es lo primero que hace al despertarse.",
-    "Adivina en qué momento sonríe más tu pareja.","Adivina qué era lo que más miedo le daba de niño.",
+    "Adivina en qué momento sonríe más tu pareja.","Adivina qué era lo que más miedo le daba a tu pareja en la infancia.",
     "Adivina qué serie o película podría ver una y otra vez sin aburrirse.",
     "Adivina cuál es su postre favorito y pregúntale si acertaste.","Adivina los tres valores más importantes para tu pareja.",
     "Pregúntale: ¿Qué crees que es lo que menos sé de ti?","Pregúntale: ¿Con qué tres palabras me describirías?",
@@ -144,7 +144,7 @@ w.KART_CEVIRILER.es={
     "Hagan un anuncio de 30 segundos para una tienda o cafetería que podrían abrir juntos algún día."
   ],
   "Yeni Tanışanlar":[
-    "Descríbete con tres palabras.","Cuenta cuál era tu juego favorito de niño.","Describe tu día ideal de fin de semana.",
+    "Descríbete con tres palabras.","Cuenta cuál era tu juego favorito en la infancia.","Describe tu día ideal de fin de semana.",
     "Si pudieras pasar un día en otra ciudad, ¿a dónde irías? Cuéntalo.",
     "Di tres cosas sobre ti: una cierta, una falsa y una extraña. Deja que tu pareja adivine.",
     "Cuenta un pequeño momento de tu vida que te haya hecho sonreír mucho.",
@@ -223,3 +223,28 @@ w.KART_CEVIRILER.es={
   ]
 };
 })(window);
+
+/* Previous wording is kept only to migrate older hidden-card preferences. */
+window.KART_ESKI_CEVIRILER=window.KART_ESKI_CEVIRILER||{};
+window.KART_ESKI_CEVIRILER["es"]=[
+  [
+    "Eğlenceli",
+    29,
+    "Confiesa algo que hacías de niño y que todavía te hace reír."
+  ],
+  [
+    "Beni Ne Kadar Tanıyorsun",
+    2,
+    "Adivina qué profesión soñaba tener tu pareja cuando era niño."
+  ],
+  [
+    "Beni Ne Kadar Tanıyorsun",
+    11,
+    "Adivina qué era lo que más miedo le daba de niño."
+  ],
+  [
+    "Yeni Tanışanlar",
+    1,
+    "Cuenta cuál era tu juego favorito de niño."
+  ]
+];

@@ -13,7 +13,7 @@ w.KART_CEVIRILER.pt={
     "Dê um beijinho na testa ou na bochecha da sua pessoa parceira.","Encostem a cabeça um no outro e fiquem em silêncio por um minuto.",
     "Pergunte: Quando você percebeu pela primeira vez que me amava?","Pergunte: Que dia da nossa vida você gostaria de viver de novo?",
     "Pergunte: Qual foi a melhor surpresa que já fizemos um para o outro?","Pergunte: Que pequeno gesto meu deixa você mais feliz?",
-    "Confesse o quanto ficou nervoso no primeiro encontro de vocês.","Confesse um hábito fofo que nunca contou à sua pessoa parceira.",
+    "Confesse quanto nervosismo sentiu no primeiro encontro de vocês.","Confesse um hábito fofo que nunca contou à sua pessoa parceira.",
     "Confesse quando sentiu saudade da sua pessoa parceira pela primeira vez.",
     "Confesse quanto tempo pensou antes de dizer «eu te amo» pela primeira vez.","Confesse o que notou primeiro na sua pessoa parceira.",
     "Leia para ela uma carta de amor engraçada e romântica de duas frases.","Desenhe um coraçãozinho ou um bilhete carinhoso em um minuto.",
@@ -117,7 +117,7 @@ w.KART_CEVIRILER.pt={
     "Contem qual foi a melhor noite que passaram em casa.","Planejem uma noite de férias em casa: o que vão fazer?",
     "Pergunte: Como seria a noite mais gostosa que poderíamos passar em casa?",
     "Pergunte: Quais são suas três coisas favoritas para fazer em casa à noite?",
-    "Confesse seu hábito mais estranho em casa.","Confesse o pequeno prazer de que mais gosta quando está sozinho em casa."
+    "Confesse seu hábito mais estranho em casa.","Confesse o pequeno prazer de que mais gosta quando tem a casa só para você."
   ],
   "Gelecek":[
     "Conte onde gostaria de morar daqui a cinco anos.","Conte sobre a primeira grande viagem que gostaria de fazer junto.",
@@ -148,7 +148,7 @@ w.KART_CEVIRILER.pt={
     "Pergunte: Tem alguma comida que nunca experimentou, mas gostaria de provar?","Pergunte: O que faria em um dia livre?",
     "Pergunte: Qual foi a última coisa engraçada que fez você rir?","Pergunte: Que habilidade gostaria de aprender?",
     "Confesse qual série ou filme você adora, mas tem um pouco de vergonha de admitir.",
-    "Confesse o que mais deixou você animado em um primeiro encontro.","Confesse um hobby meio estranho que nunca contou a ninguém.",
+    "Confesse o que mais despertou sua empolgação em um primeiro encontro.","Confesse um hobby meio estranho que nunca contou a ninguém.",
     "Confesse uma música de que gosta, mas tem um pouco de vergonha.","Imite seu animal favorito e deixe sua pessoa parceira adivinhar.",
     "Ensine à sua pessoa parceira seu passo de dança favorito.","Represente sua profissão favorita com mímica e deixe a outra pessoa adivinhar.",
     "Tentem encontrar cinco coisas em comum em 30 segundos.","Digam a cor favorita de vocês ao mesmo tempo. É a mesma?",
@@ -159,7 +159,7 @@ w.KART_CEVIRILER.pt={
   "Ok mu Nok mu":[
     "Olhar o celular enquanto come.","Comer o último pedaço sem perguntar.","Dividir as tarefas de casa exatamente pela metade.",
     "Querer acordar no mesmo horário todas as manhãs.","Esconder algo para preparar uma surpresa.","Ficar comentando durante todo o filme.",
-    "Manter todo o dinheiro em uma conta conjunta.","Sentir-se obrigado a mandar bom-dia todo dia.",
+    "Manter todo o dinheiro em uma conta conjunta.","Sentir a obrigação de mandar bom-dia todo dia.",
     "Pegar coisas emprestadas da pessoa parceira sem pedir.","Seguir o ex nas redes sociais.",
     "Perguntar à pessoa parceira antes de publicar cada foto.","Tornar o relacionamento público nas redes sociais.",
     "Não curtir o story da pessoa parceira imediatamente.","Compartilhar as senhas do celular.",
@@ -214,3 +214,28 @@ w.KART_CEVIRILER.pt={
   ]
 };
 })(window);
+
+/* Previous wording is kept only to migrate older hidden-card preferences. */
+window.KART_ESKI_CEVIRILER=window.KART_ESKI_CEVIRILER||{};
+window.KART_ESKI_CEVIRILER["pt"]=[
+  [
+    "Romantik",
+    17,
+    "Confesse o quanto ficou nervoso no primeiro encontro de vocês."
+  ],
+  [
+    "Evde Gece",
+    29,
+    "Confesse o pequeno prazer de que mais gosta quando está sozinho em casa."
+  ],
+  [
+    "Yeni Tanışanlar",
+    17,
+    "Confesse o que mais deixou você animado em um primeiro encontro."
+  ],
+  [
+    "Ok mu Nok mu",
+    7,
+    "Sentir-se obrigado a mandar bom-dia todo dia."
+  ]
+];

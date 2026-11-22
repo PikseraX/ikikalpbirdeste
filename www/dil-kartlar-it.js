@@ -4,7 +4,7 @@
 w.KART_CEVIRILER=w.KART_CEVIRILER||{};
 w.KART_CEVIRILER.it={
   "Romantik":[
-    "Di' alla persona che gioca con te tre cose che ami di lei.","Racconta cosa hai pensato quando vi siete incontrati per la prima volta.",
+    "Di' alla persona che gioca con te tre cose che ami di lei.","Racconta cosa hai pensato al vostro primo incontro.",
     "Di' alla persona che gioca con te cosa ti ha reso più felice oggi.","Dille una cosa carina che ti viene spontanea.",
     "Racconta nei dettagli il vostro ricordo più romantico.","Racconta un momento in cui questa persona ti ha sorpreso più del solito.",
     "Racconta quando hai pensato per la prima volta: «Sono felice che tu ci sia». ",
@@ -14,7 +14,7 @@ w.KART_CEVIRILER.it={
     "Appoggiate le teste l'una all'altra e restate in silenzio per un minuto.",
     "Chiedi: Quando hai capito per la prima volta di amarmi?","Chiedi: Quale giorno della nostra vita vorresti rivivere?",
     "Chiedi: Qual è stata la sorpresa più bella che ci siamo fatti?","Chiedi: Quale mio piccolo gesto ti rende più felice?",
-    "Confessa quanto eri emozionato al vostro primo appuntamento.","Confessa una tua dolce abitudine che non hai mai raccontato.",
+    "Confessa quanta emozione hai provato al vostro primo appuntamento.","Confessa una tua dolce abitudine che non hai mai raccontato.",
     "Confessa quando hai sentito la mancanza dell'altra persona per la prima volta.",
     "Confessa quanto ci hai pensato prima di dire «Ti amo» per la prima volta.","Confessa qual è stata la prima cosa che hai notato nell'altra persona.",
     "Leggi una lettera d'amore divertente e romantica di due frasi.","Disegna un piccolo cuore o un biglietto d'amore in un minuto.",
@@ -49,7 +49,7 @@ w.KART_CEVIRILER.it={
     "Chiedi: Se vincessi alla lotteria, cosa compreresti per prima cosa?",
     "Confessa la tua abitudine segreta più strana.",
     "Confessa una combinazione insolita di cibi che ti piace ma non hai mai detto a nessuno.",
-    "Confessa qualcosa che facevi da bambino e che ancora oggi ti fa ridere."
+    "Confessa qualcosa che facevi durante l'infanzia e che ancora oggi ti fa ridere."
   ],
   "Beni Ne Kadar Tanıyorsun":[
     "Indovina il piatto preferito dell'altra persona e poi chiedile se hai indovinato.",
@@ -121,11 +121,11 @@ w.KART_CEVIRILER.it={
     "Raccontate la vostra serata più bella passata a casa.","Pianificate una serata di vacanza in casa: cosa farete?",
     "Chiedi: Come sarebbe la serata più piacevole che potremmo passare a casa?",
     "Chiedi: Quali sono le tue tre cose preferite da fare a casa la sera?",
-    "Confessa la tua abitudine più strana quando sei a casa.","Confessa il piccolo piacere che ti concedi più spesso quando sei solo in casa."
+    "Confessa la tua abitudine più strana quando sei a casa.","Confessa il piccolo piacere che ti concedi più spesso quando hai la casa tutta per te."
   ],
   "Gelecek":[
     "Racconta dove ti piacerebbe vivere tra cinque anni.","Racconta il primo grande viaggio che vorresti fare insieme.",
-    "Racconta una cosa che vorreste fare insieme quando sarete più grandi.","Racconta come vorresti trascorrere una giornata da anziano.",
+    "Racconta una cosa che vorreste fare insieme quando sarete più grandi.","Racconta come vorresti trascorrere una giornata in età avanzata.",
     "Pianificate un piccolo viaggio in un Paese che vorreste visitare insieme.","Di' tre cose che vorresti fare insieme nel prossimo anno.",
     "Chiedi: Come immagini noi tra dieci anni?","Chiedi: Com'è la casa dei tuoi sogni?",
     "Chiedi: Quale nuova cosa vorresti imparare insieme?","Chiedi: Quale abitudine potremmo iniziare insieme?",
@@ -142,11 +142,11 @@ w.KART_CEVIRILER.it={
     "Create uno spot di 30 secondi per un negozio o un bar che potreste aprire insieme un giorno."
   ],
   "Yeni Tanışanlar":[
-    "Descriviti con tre parole.","Racconta il tuo gioco preferito da bambino.","Descrivi la tua giornata ideale del fine settimana.",
+    "Descriviti con tre parole.","Racconta il tuo gioco preferito durante l'infanzia.","Descrivi la tua giornata ideale del fine settimana.",
     "Se potessi passare un giorno in un'altra città, dove andresti? Raccontalo.",
     "Di' tre cose su di te: una vera, una falsa e una strana. Lascia che l'altra persona indovini.",
     "Racconta un piccolo ricordo della tua vita che ti ha fatto sorridere più di tutti.",
-    "Chiedi: Qual è il tuo piatto preferito e perché?","Chiedi: Dove non sei mai stato ma vorresti andare?",
+    "Chiedi: Qual è il tuo piatto preferito e perché?","Chiedi: Quale luogo vorresti visitare per la prima volta?",
     "Chiedi: Che cosa ti fa ridere di più?","Chiedi: Se avessi un superpotere, quale sceglieresti?",
     "Chiedi: Qual è l'unica canzone che vorresti ascoltare in questo momento?","Chiedi: Qual è la tua stagione preferita e perché?",
     "Chiedi: C'è un cibo che non hai mai provato ma vorresti assaggiare?","Chiedi: Cosa faresti in un giorno libero?",
@@ -162,7 +162,7 @@ w.KART_CEVIRILER.it={
   "Ok mu Nok mu":[
     "Guardare il telefono mentre si mangia.","Prendere l'ultimo boccone senza chiedere.","Dividere le faccende domestiche esattamente a metà.",
     "Volersi svegliare alla stessa ora ogni mattina.","Nascondere qualcosa per preparare una sorpresa.","Commentare continuamente mentre si guarda un film.",
-    "Tenere tutti i soldi su un conto comune.","Sentirsi obbligati a mandarsi il buongiorno ogni giorno.",
+    "Tenere tutti i soldi su un conto comune.","Sentire l'obbligo di mandarsi il buongiorno ogni giorno.",
     "Prendere in prestito le cose dell'altra persona senza chiedere.","Seguire il proprio ex sui social.",
     "Chiedere all'altra persona prima di pubblicare ogni foto.","Rendere pubblica la relazione sui social.",
     "Non mettere subito mi piace alla storia dell'altra persona.","Condividere i codici di sblocco del telefono.",
@@ -174,7 +174,7 @@ w.KART_CEVIRILER.it={
     "Trascorrere le feste a turno con le due famiglie.","Annullare all'ultimo momento un programma con gli amici per il o la partner."
   ],
   "İkisinden Birini Seç":[
-    "Una vacanza al mare o una vacanza in una baita in montagna?","Essere mattinieri o fare le ore piccole?",
+    "Una vacanza al mare o una vacanza in una baita in montagna?","Alzarsi presto o fare le ore piccole?",
     "Leggere un libro o guardare un film?","Vivere in città o in campagna?","Caffè o tè?","Dolce o salato?",
     "Viaggiare in aereo o in treno?","Passare un giorno nel passato o un giorno nel futuro?","Estate o inverno?",
     "Un regalo a sorpresa o un regalo scelto insieme?","Messaggi lunghi o messaggi vocali?",
@@ -200,7 +200,7 @@ w.KART_CEVIRILER.it={
     "Hai mai provato un po' di gelosia per qualcosa che riguarda l'altra persona? Dillo con dolcezza.",
     "Quale canzone associ di più all'altra persona?","Qual è stato il giorno più bello passato insieme?",
     "Qual è la prima cosa che ti ha detto e che non dimenticherai mai?","Cosa ammiri di più nell'altra persona?",
-    "Qual è la prima immagine che ti viene in mente pensando a voi da anziani?",
+    "Qual è la prima immagine che ti viene in mente pensando a voi mentre invecchiate insieme?",
     "Inventa sul momento una canzone per l'altra persona e cantala per 20 secondi.",
     "Di' «buongiorno» all'altra persona in tre modi diversi.","Imita l'altra persona per 30 secondi.",
     "Disegna un cuore per l'altra persona e regalaglielo.","Guarda l'altra persona senza sbattere le palpebre per 10 secondi.",
@@ -217,3 +217,58 @@ w.KART_CEVIRILER.it={
   ]
 };
 })(window);
+
+/* Previous wording is kept only to migrate older hidden-card preferences. */
+window.KART_ESKI_CEVIRILER=window.KART_ESKI_CEVIRILER||{};
+window.KART_ESKI_CEVIRILER["it"]=[
+  [
+    "Romantik",
+    1,
+    "Racconta cosa hai pensato quando vi siete incontrati per la prima volta."
+  ],
+  [
+    "Romantik",
+    17,
+    "Confessa quanto eri emozionato al vostro primo appuntamento."
+  ],
+  [
+    "Eğlenceli",
+    29,
+    "Confessa qualcosa che facevi da bambino e che ancora oggi ti fa ridere."
+  ],
+  [
+    "Evde Gece",
+    29,
+    "Confessa il piccolo piacere che ti concedi più spesso quando sei solo in casa."
+  ],
+  [
+    "Yeni Tanışanlar",
+    1,
+    "Racconta il tuo gioco preferito da bambino."
+  ],
+  [
+    "Yeni Tanışanlar",
+    7,
+    "Chiedi: Dove non sei mai stato ma vorresti andare?"
+  ],
+  [
+    "Gelecek",
+    3,
+    "Racconta come vorresti trascorrere una giornata da anziano."
+  ],
+  [
+    "Ok mu Nok mu",
+    7,
+    "Sentirsi obbligati a mandarsi il buongiorno ogni giorno."
+  ],
+  [
+    "İkisinden Birini Seç",
+    1,
+    "Essere mattinieri o fare le ore piccole?"
+  ],
+  [
+    "Doğruluk mu Cesaretlik mi",
+    19,
+    "Qual è la prima immagine che ti viene in mente pensando a voi da anziani?"
+  ]
+];
